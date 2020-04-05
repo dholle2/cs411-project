@@ -1,9 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <meta charset="UTF-8">
+  <title>User Search</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
   <div class="site-wrapper">
@@ -24,18 +29,19 @@
            </nav>
          </div>
        </div>
+      </div>
+       <div class="container">
+         <form method="POST" action="">
+           District <input type="text" name="location" />
+           <br>
+           Price from <input type="text" name="lowerprice" /> to <input type="text" name="upperprice" />
+           <br>
+           Safety Rating <input type="text" name="safety" />
+           <br>
+           <input type="submit">
+         </form>
+       </div>
 
-       <form method="POST" action="">
-         District <input type="text" name="location" />
-         <br>
-         Price from <input type="text" name="lowerprice" /> to <input type="text" name="upperprice" />
-         <br>
-         Safety Rating <input type="text" name="safety" />
-         <br>
-         <input type="submit">
-     </form>
-
-     </div>
 
    </div>
 
