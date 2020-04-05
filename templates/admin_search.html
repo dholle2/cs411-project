@@ -6,7 +6,6 @@
 
   <meta charset="UTF-8">
   <title>Admin Search</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
   <link rel="stylesheet" href="style.css"/>
 </head>
@@ -20,22 +19,29 @@
             <h3 class="masthead-brand">Home</h3>
             <nav>
               <ul class="nav masthead-nav">
-                <li class="active"><a href="index.html">Home</a></li>
-                <li><a href="admin_search.html">User Side</a></li>
-                <li><a href="user_search.html">Admin Side</a></li>
+                <li class="active"><a href="/">Home</a></li>
+                <li><a href="user_search.html">User Side</a></li>
+                <li><a href="admin_search.html">Admin Side</a></li>
               </ul>
             </nav>
           </div>
         </div>
     <div class="container">
       <form method="POST" action="">
-          District <input type="text" name="location" />
-          <br>
-          Price from <input type="text" name="lowerprice" /> to <input type="text" name="upperprice" />
-          <br>
-          Safety Rating <input type="text" name="safety" />
-          <br>
-          <input type="submit">
+        Description <input type="int" name="description" />
+        <br>
+        Zipcode <input type="int" name="zipcode" />
+        <br>
+        <!-- Price from <input type="text" name="lowerprice" /> to <input type="text" name="upperprice" /> -->
+        Num_Guests <input type="int" name="num_guests" />
+        <br>
+        Price <input type="int" name="price" />
+        <br>
+        Landlord <input type="text" name="landlord" />
+        <br>
+        Safety Rating <input type="text" name="safety" />
+        <br>
+        <input type="submit">
       </form>
   </div>
 </div>

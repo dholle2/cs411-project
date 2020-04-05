@@ -19,6 +19,14 @@ CORS(app)
 def index():
     return render_template('index.html')
 
+@app.route('/user_search.html')
+def user_search():
+    return render_template('user_search.html')
+
+@app.route('/admin_search.html')
+def admin_search():
+    return render_template('admin_search.html')
+
 @app.route('/data', methods = ['GET', 'POST'])
 def data():
     if request.method == 'POST':
