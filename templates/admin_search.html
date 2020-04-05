@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+
+    <div class="masthead clearfix">
+      <div class="container inner">
+        <h3 class="masthead-brand">Home</h3>
+        <nav>
+          <ul class="nav masthead-nav">
+            <li class="active"><a href="index.html">Home</a></li>
+            <li><a href="admin_search.html">User Side</a></li>
+            <li><a href="user_search.html">Admin Side</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+<form method="POST" action="">
+    District <input type="text" name="location" />
+    <br>
+    Price from <input type="text" name="lowerprice" /> to <input type="text" name="upperprice" />
+    <br>
+    Safety Rating <input type="text" name="safety" />
+    <br>
+    <input type="submit">
+</form>
+</body>
+</html>
