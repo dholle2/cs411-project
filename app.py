@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, jsonify
 from flask_cors import CORS
 from flask_mysqldb import MySQL
+from flask_bootstrap import Bootstrap
 import yaml
 
 db = yaml.load(open('db.yaml'))
@@ -12,6 +13,7 @@ app.config['MYSQL_DB'] = db['mysql_db']
 
 mysql = MySQL(app)
 CORS(app)
+# Bootstrap(app)
 
 @app.route('/')
 def index():
@@ -107,7 +109,7 @@ def single(id):
             }
             data.append(dataDict)
         return jsonify(data)
-        
+
     if request.method == 'DELETE':
         cursor = mysql.connection.cursor()
         cursor.execute('DELETE FROM listings WHERE id = %s', (id))
