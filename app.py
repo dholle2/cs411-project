@@ -87,7 +87,7 @@ def delete_apartment(apartment_id):
     db2.session.delete(apartment)
     db2.session.commit()
     return redirect(url_for('admin_search'))
-
+# update
 @app.route('/admin_search.html/update/<apartment_id>', methods=['GET', 'POST'] )
 def update_apartment(apartment_id):
     apartment = Apartment.query.get(apartment_id)
