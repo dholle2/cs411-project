@@ -55,6 +55,47 @@
         <input type="submit">
       </form>
   </div>
+    <div class="container">
+      <form method="POST" action="">
+        Zipcode <input type="text" name="zipcode" />
+        <br>
+        Guest <input type="text" name="guest" />
+        <br>
+        Price from <input type="text" name="lowerprice" /> to <input type="text" name="upperprice" />
+        <br>
+        Safety Rating <input type="text" name="safety" />
+        <br>
+        <input type="submit">
+      </form>
+    </div>
+    <div class="result">
+           <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Description</th>
+                    <th>Zipcode</th>
+                    <th>Num_Guests</th>
+                    <th>Price</th>
+                    <th>Landlord</th>
+                    <th>Safety Rating</th>
+                    <th>Operation</th>
+                </tr>
+                    {% for apartment in results %}
+                        <tr>
+                            <td>{{ apartment.ID }}</td>
+                            <td>{{ apartment.Description }}</td>
+                            <td>{{ apartment.Zipcode }}</td>
+                            <td>{{ apartment.NumGuests }}</td>
+                            <td>{{ apartment.Price }}</td>
+                            <td>{{ apartment.Landlord }}</td>
+                            <td>{{ apartment.SafetyRating }}</td>
+                            <td><a href="{{ url_for("update_apartment", apartment_id=apartment.ID) }}">Edit</a>/
+                                <a href="{{ url_for("delete_apartment", apartment_id=apartment.ID) }}">Delete</a></td>
+                        </tr>
+                    {% endfor %}
+            </table>
+    </div>
+
 </div>
 </div>
 </div>

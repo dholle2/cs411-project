@@ -31,7 +31,9 @@
    </div>
     <div class="container">
       <form method="POST" action="">
-        District <input type="text" name="location" />
+        Zipcode <input type="text" name="zipcode" />
+        <br>
+        Guest <input type="text" name="guest" />
         <br>
         Price from <input type="text" name="lowerprice" /> to <input type="text" name="upperprice" />
         <br>
@@ -40,6 +42,31 @@
         <input type="submit">
       </form>
     </div>
+    <div class="result">
+           <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Description</th>
+                    <th>Zipcode</th>
+                    <th>Num_Guests</th>
+                    <th>Price</th>
+                    <th>Landlord</th>
+                    <th>Safety Rating</th>
+                </tr>
+                    {% for apartment in results %}
+                        <tr>
+                            <td>{{ apartment.ID }}</td>
+                            <td>{{ apartment.Description }}</td>
+                            <td>{{ apartment.Zipcode }}</td>
+                            <td>{{ apartment.NumGuests }}</td>
+                            <td>{{ apartment.Price }}</td>
+                            <td>{{ apartment.Landlord }}</td>
+                            <td>{{ apartment.SafetyRating }}</td>
+                        </tr>
+                    {% endfor %}
+            </table>
+    </div>
+
   </div>
 </div>
 

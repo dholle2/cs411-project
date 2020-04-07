@@ -134,3 +134,12 @@ body {
   }
 
 }
+
+table {
+  text-align: center;
+}
+.result {
+  text-align: center;
+  width: 80%;
+  margin: 50px 10%;
+}
