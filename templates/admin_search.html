@@ -28,31 +28,20 @@
         </div>
     <div class="container">
       <form method="POST" action="">
-        <div class="form-group">
-          <label for="descriptionInput">Description</label>
-          <input type="text" type="form-control" id="descriptionInput" placeholder="Enter Description">
-        </div>
-        <div class="form-group">
-          <label for="zipcodeInput">Zipcode</label>
-          <input type="int" type="form-control" id="zipcodeInput" placeholder="Enter Zipcode">
-        </div>
-        <div class="form-group">
-          <label for="numGuestsInput">Number of Guests</label>
-          <input type="int" type="form-control" id="numGuestsInput" placeholder="Enter Num of Guests">
-        </div>
-        <div class="form-group">
-          <label for="priceInput">Price</label>
-          <input type="int" type="form-control" id="priceInput" placeholder="Enter Price">
-        </div>
-        <div class="form-group">
-          <label for="landlordInput">Landlord</label>
-          <input type="text" type="form-control" id="landlordInput" placeholder="Enter Landlord Name">
-        </div>
-        <div class="form-group">
-          <label for="safetyInput">Safety Rating</label>
-          <input type="int" type="form-control" id="safetyInput" placeholder="Enter Rating">
-        </div>
-        <input type="submit">
+        Description <input type="text" name="description" />
+        <br>
+        Zipcode <input type="number" name="zipcode" />
+        <br>
+        <!-- Price from <input type="text" name="lowerprice" /> to <input type="text" name="upperprice" /> -->
+        Num_Guests <input type="number" name="num_guests" />
+        <br>
+        Price <input type="number" name="price" />
+        <br>
+        Landlord <input type="text" name="landlord" />
+        <br>
+        Safety Rating <input type="number" step="0.1" name="safety_rating" />
+        <br>
+        <input type="submit" name="new_listing" value="new_listing">
       </form>
   </div>
     <div class="container">
@@ -65,7 +54,7 @@
         <br>
         Safety Rating <input type="text" name="safety" />
         <br>
-        <input type="submit">
+        <input type="submit" name="search_listing" value="search_listing">
       </form>
     </div>
     <div class="result">

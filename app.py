@@ -15,7 +15,7 @@ app.config['MYSQL_HOST'] = db['mysql_host']
 app.config['MYSQL_USER'] = db['mysql_user']
 app.config['MYSQL_PASSWORD'] = db['mysql_password']
 app.config['MYSQL_DB'] = db['mysql_db']
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@127.0.0.1/airbnb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:pass@127.0.0.1/airbnb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 #app.config.from_pyfile('config.conf')
 
@@ -51,16 +51,30 @@ def index():
 def admin_search():
     results = []
     if request.method == 'POST':
-        zipcode = request.form.get('zipcode')
-        guest = request.form.get('guest')
-        lowerprice = request.form.get('lowerprice')
-        upperprice = request.form.get('upperprice')
-        safety = request.form.get('safety')
-        results = Apartment.query.all()
-        if zipcode !='':
-            results = Apartment.query.filter(Apartment.Zipcode==zipcode).all()
-            if guest != '':
-                results = Apartment.query.filter(Apartment.NumGuests==guest, Apartment.Zipcode==zipcode).all()
+        if 'search_listing' in request.form:
+            zipcode = request.form.get('zipcode')
+            guest = request.form.get('guest')
+            lowerprice = request.form.get('lowerprice')
+            upperprice = request.form.get('upperprice')
+            safety = request.form.get('safety')
+            results = Apartment.query.all()
+            if zipcode !='':
+                results = Apartment.query.filter(Apartment.Zipcode==zipcode).all()
+                if guest != '':
+                    results = Apartment.query.filter(Apartment.NumGuests==guest, Apartment.Zipcode==zipcode).all()
+        if 'new_listing' in request.form:
+            listingDetails = request.form
+            description = listingDetails['description']
+            zipcode = listingDetails['zipcode']
+            num_guests = listingDetails['num_guests']
+            price = listingDetails['price']
+            landlord = listingDetails['landlord']
+            safety_rating = listingDetails['safety_rating']
+
+            cur = mysql.connection.cursor()
+            cur.execute("INSERT INTO apartment VALUES(null, %s, %s, %s, %s, %s, %s)", (str(description), zipcode, num_guests, price, str(landlord), safety_rating))
+            mysql.connection.commit()
+            cur.close()
     return render_template('admin_search.html', results=results)
 
 # search
@@ -78,6 +92,7 @@ def user_search():
             results = Apartment.query.filter(Apartment.Zipcode==zipcode).all()
             if guest != '':
                 results = Apartment.query.filter(Apartment.NumGuests==guest, Apartment.Zipcode==zipcode).all()
+
 
     return render_template('user_search.html', results=results)
 
