@@ -63,6 +63,7 @@ def admin_search():
                 results = Apartment.query.filter(Apartment.NumGuests==guest, Apartment.Zipcode==zipcode).all()
     return render_template('admin_search.html', results=results)
 
+# search
 @app.route('/user_search.html', methods=['GET', 'POST'])
 def user_search():
     results = []
@@ -87,7 +88,7 @@ def delete_apartment(apartment_id):
     db2.session.delete(apartment)
     db2.session.commit()
     return redirect(url_for('admin_search'))
-# update
+# update data
 @app.route('/admin_search.html/update/<apartment_id>', methods=['GET', 'POST'] )
 def update_apartment(apartment_id):
     apartment = Apartment.query.get(apartment_id)
