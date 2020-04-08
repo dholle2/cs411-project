@@ -4,6 +4,7 @@ from flask_mysqldb import MySQL
 from flask_bootstrap import Bootstrap
 import yaml
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import or_,and_
 
 #import sys
 #reload(sys)
@@ -15,7 +16,7 @@ app.config['MYSQL_HOST'] = db['mysql_host']
 app.config['MYSQL_USER'] = db['mysql_user']
 app.config['MYSQL_PASSWORD'] = db['mysql_password']
 app.config['MYSQL_DB'] = db['mysql_db']
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:pass@127.0.0.1/airbnb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@127.0.0.1/airbnb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 #app.config.from_pyfile('config.conf')
 
@@ -26,7 +27,6 @@ db2 = SQLAlchemy(app)
 
 class Apartment(db2.Model):
     __tablename__ = 'apartment'
-
     # columns
     ID = db2.Column(db2.Integer, primary_key=True)
     Description = db2.Column(db2.String(250))
@@ -35,10 +35,6 @@ class Apartment(db2.Model):
     Price = db2.Column(db2.Integer)
     Landlord = db2.Column(db2.String(50))
     SafetyRating = db2.Column(db2.Float)
-
-    # 关系引用
-    # books是给自己(Author模型)用的, author是给Book模型用的
-    # books = db.relationship('Book', backref='author')
 
     def __repr__(self):
         return 'Apartment ID: %s Landord: %s' % (self.ID, self.Landlord)
@@ -57,11 +53,25 @@ def admin_search():
             lowerprice = request.form.get('lowerprice')
             upperprice = request.form.get('upperprice')
             safety = request.form.get('safety')
+            landlord = request.form.get('landlord')
+            description = request.form.get('description')
             results = Apartment.query.all()
-            if zipcode !='':
-                results = Apartment.query.filter(Apartment.Zipcode==zipcode).all()
-                if guest != '':
-                    results = Apartment.query.filter(Apartment.NumGuests==guest, Apartment.Zipcode==zipcode).all()
+            condition = Apartment.ID != ''
+            if zipcode:
+                condition = and_(condition, Apartment.Zipcode == zipcode)
+            if guest:
+                condition = and_(condition, Apartment.NumGuests == guest)
+            if lowerprice:
+                condition = and_(condition, Apartment.Price >= lowerprice)
+            if upperprice:
+                condition = and_(condition, Apartment.Price <= upperprice)
+            if safety:
+                condition = and_(condition, Apartment.SafetyRating >= safety)
+            if landlord:
+                condition = and_(condition, Apartment.Landlord.like('%' + landlord + '%'))
+            if description:
+                condition = and_(condition, Apartment.Description.like('%' + description + '%'))
+            results = Apartment.query.filter(condition).all()
         if 'new_listing' in request.form:
             listingDetails = request.form
             description = listingDetails['description']
@@ -87,13 +97,25 @@ def user_search():
         lowerprice = request.form.get('lowerprice')
         upperprice = request.form.get('upperprice')
         safety = request.form.get('safety')
+        landlord = request.form.get('landlord')
+        description = request.form.get('description')
         results = Apartment.query.all()
-        if zipcode !='':
-            results = Apartment.query.filter(Apartment.Zipcode==zipcode).all()
-            if guest != '':
-                results = Apartment.query.filter(Apartment.NumGuests==guest, Apartment.Zipcode==zipcode).all()
-
-
+        condition = Apartment.ID != ''
+        if zipcode:
+            condition = and_(condition, Apartment.Zipcode == zipcode)
+        if guest:
+            condition = and_(condition, Apartment.NumGuests == guest)
+        if lowerprice:
+            condition = and_(condition, Apartment.Price >= lowerprice)
+        if upperprice:
+            condition = and_(condition, Apartment.Price <= upperprice)
+        if safety:
+            condition = and_(condition, Apartment.SafetyRating >= safety)
+        if landlord:
+            condition = and_(condition, Apartment.Landlord.like('%' + landlord + '%'))
+        if description:
+            condition = and_(condition, Apartment.Description.like('%' + description + '%'))
+        results = Apartment.query.filter(condition).all()
     return render_template('user_search.html', results=results)
 
 # delete data
@@ -103,6 +125,7 @@ def delete_apartment(apartment_id):
     db2.session.delete(apartment)
     db2.session.commit()
     return redirect(url_for('admin_search'))
+
 # update data
 @app.route('/admin_search.html/update/<apartment_id>', methods=['GET', 'POST'] )
 def update_apartment(apartment_id):
@@ -245,13 +268,13 @@ if __name__ == '__main__':
     db2.drop_all()
     db2.create_all()
 
-    # 生成数据
+
     ap1 = Apartment(ID=1, Description='NICE', Zipcode=61820, NumGuests=3, Price=1000, Landlord='Jack', SafetyRating=5.8)
     ap2 = Apartment(ID=2, Description='good', Zipcode=91798, NumGuests=1, Price=200, Landlord='Rose', SafetyRating=4.3)
     ap3 = Apartment(ID=3, Description='great', Zipcode=91798, NumGuests=2, Price=500, Landlord='Mike', SafetyRating=5.3)
-    # 把数据提交给用户会话
+
     db2.session.add_all([ap1,ap2,ap3])
-    # 提交会话
+
     db2.session.commit()
 
     app.run(debug=True)

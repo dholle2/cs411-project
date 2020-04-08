@@ -30,19 +30,35 @@
     </div>
    </div>
     <div class="container">
-      <form method="POST" action="">
-        Zipcode <input type="text" name="zipcode" />
-        <br>
-        Guest <input type="text" name="guest" />
-        <br>
-        Price from <input type="text" name="lowerprice" /> to <input type="text" name="upperprice" />
-        <br>
-        Safety Rating <input type="text" name="safety" />
-        <br>
-        <input type="submit">
+       <form method="POST" action="">
+        <div class="form-group">
+          <label for="zipcodeInput">Zipcode</label>
+          <input type="int" type="form-control" id="zipcodeInput" name="zipcode">
+        </div>
+        <div class="form-group">
+          <label for="numGuestsInput">Number of Guests</label>
+          <input type="int" type="form-control" id="numGuestsInput" name="guest">
+        </div>
+        <div class="form-group">
+          <label for="priceInput">Price</label>
+          from <input type="int" type="form-control" id="priceInput" name="lowerprice">
+          to <input type="int" type="form-control" id="priceInput" name="upperprice">
+        </div>
+        <div class="form-group">
+          <label for="safetyInput">Safety Rating</label>
+          from<input type="int" type="form-control" id="safetyInput" name="safety">
+        </div>
+        <div class="form-group">
+          <label for="landlordInput">Landlord</label>
+          <input type="text" type="form-control" id="landlordInput" name="landlord">
+        </div>
+         <div class="form-group">
+          <label for="descriptionInput">Description</label>
+          <input type="text" type="form-control" id="descriptionInput" name="description">
+        </div>
+        <input type="submit" name="search_listing" value="search_listing">
       </form>
     </div>
-    <div class="result">
            <table>
                 <tr>
                     <th>ID</th>
@@ -65,7 +81,6 @@
                         </tr>
                     {% endfor %}
             </table>
-    </div>
 
   </div>
 </div>

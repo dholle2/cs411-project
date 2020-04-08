@@ -136,10 +136,13 @@ body {
 }
 
 table {
-  text-align: center;
-}
-.result {
-  text-align: center;
   width: 80%;
-  margin: 50px 10%;
+  margin: 100px auto;
+  text-align: center;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+tr {
+  height: 30px;
 }
