@@ -71,13 +71,13 @@
                 </tr>
                     {% for apartment in results %}
                         <tr>
-                            <td>{{ apartment.ID }}</td>
-                            <td>{{ apartment.Description }}</td>
-                            <td>{{ apartment.Zipcode }}</td>
-                            <td>{{ apartment.NumGuests }}</td>
-                            <td>{{ apartment.Price }}</td>
-                            <td>{{ apartment.Landlord }}</td>
-                            <td>{{ apartment.SafetyRating }}</td>
+                            <td>{{ apartment[0] }}</td>
+                            <td>{{ apartment[1] }}</td>
+                            <td>{{ apartment[2] }}</td>
+                            <td>{{ apartment[3] }}</td>
+                            <td>{{ apartment[4] }}</td>
+                            <td>{{ apartment[5] }}</td>
+                            <td>{{ apartment[6] }}</td>
                         </tr>
                     {% endfor %}
             </table>

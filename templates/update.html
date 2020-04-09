@@ -30,31 +30,31 @@
       <form method="POST" action="">
         <div class="form-group">
           <label for="IDInput">ID</label>
-          <input type="text" type="form-control" id="IDInput" name="ID" value="{{ apartment.ID }}">
+          <input type="text" type="form-control" id="IDInput" name="ID" value="{{ apartment[0] }}">
         </div>
         <div class="form-group">
           <label for="descriptionInput">Description</label>
-          <input type="text" type="form-control" id="descriptionInput" name="description" value="{{ apartment.Description }}">
+          <input type="text" type="form-control" id="descriptionInput" name="description" value="{{ apartment[1] }}">
         </div>
         <div class="form-group">
           <label for="zipcodeInput">Zipcode</label>
-          <input type="int" type="form-control" id="zipcodeInput" name="zipcode" value="{{ apartment.Zipcode }}">
+          <input type="int" type="form-control" id="zipcodeInput" name="zipcode" value="{{ apartment[2] }}">
         </div>
         <div class="form-group">
           <label for="numGuestsInput">Number of Guests</label>
-          <input type="int" type="form-control" id="numGuestsInput" name="guest" value="{{ apartment.NumGuests }}">
+          <input type="int" type="form-control" id="numGuestsInput" name="guest" value="{{ apartment[3] }}">
         </div>
         <div class="form-group">
           <label for="priceInput">Price</label>
-          <input type="int" type="form-control" id="priceInput" name="price" value="{{ apartment.Price }}">
+          <input type="int" type="form-control" id="priceInput" name="price" value="{{ apartment[4] }}">
         </div>
         <div class="form-group">
           <label for="landlordInput">Landlord</label>
-          <input type="text" type="form-control" id="landlordInput" name="landlord" value="{{ apartment.Landlord }}">
+          <input type="text" type="form-control" id="landlordInput" name="landlord" value="{{ apartment[5] }}">
         </div>
         <div class="form-group">
           <label for="safetyInput">Safety Rating</label>
-          <input type="int" type="form-control" id="safetyInput" name="safety" value="{{ apartment.SafetyRating }}">
+          <input type="int" type="form-control" id="safetyInput" name="safety" value="{{ apartment[6] }}">
         </div>
         <input type="submit">
       </form>

@@ -4,7 +4,7 @@ from flask_mysqldb import MySQL
 from flask_bootstrap import Bootstrap
 import yaml
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import or_,and_
+#from sqlalchemy import or_,and_
 
 #import sys
 #reload(sys)
@@ -25,6 +25,7 @@ CORS(app)
 # Bootstrap(app)
 db2 = SQLAlchemy(app)
 
+#create table
 class Apartment(db2.Model):
     __tablename__ = 'apartment'
     # columns
@@ -43,6 +44,7 @@ class Apartment(db2.Model):
 def index():
     return render_template('index.html')
 
+#search & insert
 @app.route('/admin_search.html', methods=['GET', 'POST'])
 def admin_search():
     results = []
@@ -55,23 +57,37 @@ def admin_search():
             safety = request.form.get('safety')
             landlord = request.form.get('landlord')
             description = request.form.get('description')
-            results = Apartment.query.all()
-            condition = Apartment.ID != ''
+            id = ''
+            condition = ["ID != %s"]
+            para = [id]
             if zipcode:
-                condition = and_(condition, Apartment.Zipcode == zipcode)
+                condition.append("Zipcode=%s")
+                para.append(int(zipcode))
             if guest:
-                condition = and_(condition, Apartment.NumGuests == guest)
+                condition.append("NumGuests=%s")
+                para.append(int(guest))
             if lowerprice:
-                condition = and_(condition, Apartment.Price >= lowerprice)
+                condition.append("Price>=%s")
+                para.append(int(lowerprice))
             if upperprice:
-                condition = and_(condition, Apartment.Price <= upperprice)
+                condition.append("Price<=%s")
+                para.append(int(upperprice))
             if safety:
-                condition = and_(condition, Apartment.SafetyRating >= safety)
+                condition.append("SafetyRating>=%s")
+                para.append(float(safety))
             if landlord:
-                condition = and_(condition, Apartment.Landlord.like('%' + landlord + '%'))
+                condition.append("Landlord  LIKE %s")
+                para.append('%' + landlord + '%')
             if description:
-                condition = and_(condition, Apartment.Description.like('%' + description + '%'))
-            results = Apartment.query.filter(condition).all()
+                condition.append("Description LIKE %s")
+                para.append('%' + description + '%')
+            cur = mysql.connection.cursor()
+            results = cur.execute("SELECT * FROM apartment WHERE " + " AND ".join(condition), para)
+            if results > 0:
+                resultsDetails = cur.fetchall()
+            else:
+                resultsDetails = []
+            return render_template('admin_search.html', results=resultsDetails)
         if 'new_listing' in request.form:
             listingDetails = request.form
             description = listingDetails['description']
@@ -99,37 +115,54 @@ def user_search():
         safety = request.form.get('safety')
         landlord = request.form.get('landlord')
         description = request.form.get('description')
-        results = Apartment.query.all()
-        condition = Apartment.ID != ''
+        id=''
+        condition = ["ID != %s"]
+        para = [id]
         if zipcode:
-            condition = and_(condition, Apartment.Zipcode == zipcode)
+            condition.append("Zipcode=%s")
+            para.append(int(zipcode))
         if guest:
-            condition = and_(condition, Apartment.NumGuests == guest)
+            condition.append("NumGuests=%s")
+            para.append(int(guest))
         if lowerprice:
-            condition = and_(condition, Apartment.Price >= lowerprice)
+            condition.append("Price>=%s")
+            para.append(int(lowerprice))
         if upperprice:
-            condition = and_(condition, Apartment.Price <= upperprice)
+            condition.append("Price<=%s")
+            para.append(int(upperprice))
         if safety:
-            condition = and_(condition, Apartment.SafetyRating >= safety)
+            condition.append("SafetyRating>=%s")
+            para.append(float(safety))
         if landlord:
-            condition = and_(condition, Apartment.Landlord.like('%' + landlord + '%'))
+            condition.append("Landlord  LIKE %s")
+            para.append('%'+landlord+'%')
         if description:
-            condition = and_(condition, Apartment.Description.like('%' + description + '%'))
-        results = Apartment.query.filter(condition).all()
+            condition.append("Description LIKE %s")
+            para.append('%'+description+'%')
+        cur = mysql.connection.cursor()
+        results = cur.execute("SELECT * FROM apartment WHERE " + " AND ".join(condition), para)
+        if results > 0:
+            resultsDetails = cur.fetchall()
+        else:
+            resultsDetails = []
+        return render_template('user_search.html', results=resultsDetails)
     return render_template('user_search.html', results=results)
 
 # delete data
 @app.route('/admin_search.html/delete/<apartment_id>')
 def delete_apartment(apartment_id):
-    apartment = Apartment.query.get(apartment_id)
-    db2.session.delete(apartment)
-    db2.session.commit()
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM apartment WHERE ID=(%s)", (apartment_id))
+    mysql.connection.commit()
+    cur.close()
     return redirect(url_for('admin_search'))
 
 # update data
 @app.route('/admin_search.html/update/<apartment_id>', methods=['GET', 'POST'] )
 def update_apartment(apartment_id):
-    apartment = Apartment.query.get(apartment_id)
+    cur = mysql.connection.cursor()
+    results = cur.execute("SELECT * FROM apartment WHERE ID=%s", (apartment_id))
+    apartment=cur.fetchone()
     if request.method == 'POST':
         id = request.form.get('ID')
         description = request.form.get('description')
@@ -138,14 +171,11 @@ def update_apartment(apartment_id):
         price = request.form.get('price')
         landlord = request.form.get('landlord')
         safety = request.form.get('safety')
-        apartment.ID = id
-        apartment.Description = description
-        apartment.Zipcode = zipcode
-        apartment.NumGuests = guest
-        apartment.Price = price
-        apartment.Landlord = landlord
-        apartment.SafetyRating = safety
-        db2.session.commit()
+        cur = mysql.connection.cursor()
+        cur.execute("UPDATE apartment SET ID=%s, Description=%s, Zipcode=%s, NumGuests=%s, Price=%s, Landlord=%s, SafetyRating=%s WHERE ID=(%s)",
+                    (id, description, zipcode, guest, price, landlord, safety, apartment_id))
+        mysql.connection.commit()
+        cur.close()
         return redirect(url_for('admin_search'))
     return render_template('update.html', apartment=apartment)
 
