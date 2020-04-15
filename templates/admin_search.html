@@ -12,12 +12,12 @@
 <body>
   <div class="site-wrapper">
     <div class="site-wrapper-inner">
-      <div class="container">
+      <div class="container" style="background-color: #e66a6f">
         <!-- navbar -->
         <div class="masthead clearfix">
-          <div class="container inner">
+          <div class="container-fluid inner">
             <h3 class="masthead-brand">Home</h3>
-            <nav>
+            <nav class="">
               <ul class="nav masthead-nav">
                 <li class="active"><a href="/">Home</a></li>
                 <li><a href="user_search.html">User Side</a></li>
@@ -26,80 +26,142 @@
             </nav>
           </div>
         </div>
-    <div class="container">
-      <form method="POST" action="">
-        Description <input type="text" name="description" />
-        <br>
-        Zipcode <input type="number" name="zipcode" />
-        <br>
-        <!-- Price from <input type="text" name="lowerprice" /> to <input type="text" name="upperprice" /> -->
-        Num_Guests <input type="number" name="num_guests" />
-        <br>
-        Price <input type="number" name="price" />
-        <br>
-        Landlord <input type="text" name="landlord" />
-        <br>
-        Safety Rating <input type="number" step="0.1" name="safety_rating" />
-        <br>
-        <input type="submit" name="new_listing" value="new_listing">
-      </form>
-  </div>
-    <div class="container">
-      <form method="POST" action="">
-        <div class="form-group">
-          <label for="zipcodeInput">Zipcode</label>
-          <input type="int" type="form-control" id="zipcodeInput" name="zipcode">
-        </div>
-        <div class="form-group">
-          <label for="numGuestsInput">Number of Guests</label>
-          <input type="int" type="form-control" id="numGuestsInput" name="guest">
-        </div>
-        <div class="form-group">
-          <label for="priceInput">Price</label>
-          from <input type="int" type="form-control" id="priceInput" name="lowerprice">
-          to <input type="int" type="form-control" id="priceInput" name="upperprice">
-        </div>
-        <div class="form-group">
-          <label for="safetyInput">Safety Rating</label>
-          from<input type="int" type="form-control" id="safetyInput" name="safety">
-        </div>
-        <div class="form-group">
-          <label for="landlordInput">Landlord</label>
-          <input type="text" type="form-control" id="landlordInput" name="landlord">
-        </div>
-         <div class="form-group">
-          <label for="descriptionInput">Description</label>
-          <input type="text" type="form-control" id="descriptionInput" name="description">
-        </div>
-        <input type="submit" name="search_listing" value="search_listing">
-      </form>
-    </div>
+        <!-- <br/>
+        <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e66a6f">
+          <a class="navbar-brand" href="/"><h3>Home</h3></a>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item active">
+                <a class="nav-link" href="user_search.html">User Side</a>
+              </li>
+              <li class="nav-item active">
+                <a class="nav-link" href="admin_search.html">Admin Side</a>
+              </li>
+            </ul>
+          </div>
+        </nav> -->
 
-      <table>
-          <tr>
-              <th>ID</th>
-              <th>Description</th>
-              <th>Zipcode</th>
-              <th>Num_Guests</th>
-              <th>Price</th>
-              <th>Landlord</th>
-              <th>Safety Rating</th>
-              <th>Operation</th>
-          </tr>
-          {% for apartment in results %}
-              <tr>
-                  <td>{{ apartment[0] }}</td>
-                  <td>{{ apartment[1] }}</td>
-                  <td>{{ apartment[2] }}</td>
-                  <td>{{ apartment[3] }}</td>
-                  <td>{{ apartment[4] }}</td>
-                  <td>{{ apartment[5] }}</td>
-                  <td>{{ apartment[6] }}</td>
-                  <td><a href="{{ url_for("update_apartment", apartment_id=apartment[0]) }}">Edit</a>/
-                      <a href="{{ url_for("delete_apartment", apartment_id=apartment[0]) }}">Delete</a></td>
-              </tr>
-          {% endfor %}
-      </table>
+        <br/><br/><br/><br/><br/><br/>
+        <!-- <br/><br/> -->
+
+        <div class="container">
+          <div class="row">
+            <!-- insert new listing -->
+            <div class="col-md">
+              <div class="container">
+                <h4> Insert New Listing </h4>
+                <br/>
+                <form class="form-horizontal" method="POST" action="">
+                 <div class="form-group row">
+                   <label for="zipcodeInput" class="col-sm-4 control-label">Zipcode</label>
+                   <div class="col-sm-8">
+                     <input type="int" class="form-control" id="zipcodeInput" placeholder="Zipcode" name="zipcode">
+                   </div>
+                 </div>
+                 <div class="form-group row">
+                   <label for="numGuestsInput" class="col-sm-4 control-label">Number of Guests</label>
+                   <div class="col-sm-8">
+                     <input type="int" class="form-control" id="numGuestsInput" placeholder="Number of Guests" name="num_guests">
+                   </div>
+                 </div>
+                 <div class="form-group row">
+                   <label for="priceInput" class="col-sm-4 control-label">Price</label>
+                   <div class="col-sm-8">
+                     <input type="int" class="form-control" placeholder="Price" name="price"/>
+                   </div>
+                 </div>
+                 <div class="form-group row">
+                   <label for="safetyInput" class="col-sm-4 control-label">Safety Rating</label>
+                   <div class="col-sm-8">
+                     <input type="int" class="form-control" id="safetyInput" placeholder="Safety Rating" name="safety_rating">
+                   </div>
+                 </div>
+                 <div class="form-group row">
+                   <label for="landlordInput" class="col-sm-4 control-label">Landlord</label>
+                   <div class="col-sm-8">
+                     <input type="text" class="form-control" id="landlordInput" placeholder="Landlord" name="landlord">
+                   </div>
+                 </div>
+                  <div class="form-group row">
+                   <label for="descriptionInput" class="col-sm-4 control-label">Description</label>
+                   <div class="col-sm-8">
+                     <input type="text" class="form-control" id="descriptionInput" placeholder="Description" name="description">
+                   </div>
+                 </div>
+                 <!-- <input type="submit" name="search_listing" value="search_listing"> -->
+                 <input type="submit" class="btn btn-primary" name="new_listing" value="Insert New Listing"/>
+               </form>
+              </div>
+            </div>
+            <!-- search for listing -->
+          <div class="col-md">
+            <div class="container">
+              <h4> Search For Listings </h4>
+              <br/>
+              <form class="form-horizontal" method="POST" action="">
+               <div class="form-group row">
+                 <label for="zipcodeInput" class="col-sm-4 control-label">Zipcode</label>
+                 <div class="col-sm-8">
+                   <input type="int" class="form-control" id="zipcodeInput" placeholder="Zipcode" name="zipcode">
+                 </div>
+               </div>
+               <div class="form-group row">
+                 <label for="numGuestsInput" class="col-sm-4 control-label">Number of Guests</label>
+                 <div class="col-sm-8">
+                   <input type="int" class="form-control" id="numGuestsInput" placeholder="Number of Guests" name="guest">
+                 </div>
+               </div>
+               <div class="form-group row">
+                 <label for="priceInput" class="col-sm-4 control-label">Price</label>
+                 <div class="col">
+                   <input type="int" class="form-control" id="priceInput" placeholder="Lower price" name="lowerprice">
+                 </div>
+                 <label> to </label>
+                 <div class="col">
+                   <input type="int" class="form-control" id="priceInput" placeholder="Upper price" name="upperprice">
+                 </div>
+               </div>
+               <div class="form-group row">
+                 <label for="safetyInput" class="col-sm-4 control-label">Safety Rating from</label>
+                 <div class="col-sm-8">
+                   <input type="int" class="form-control" id="safetyInput" placeholder="Safety Rating" name="safety">
+                 </div>
+               </div>
+               <!-- <input type="submit" name="search_listing" value="search_listing"> -->
+               <input type="submit" class="btn btn-primary" name="search_listing" value="Search For Listings"/>
+             </form>
+            </div>
+          </div>
+          </div>
+        </div>
+
+        <div class="container">
+          <table>
+            <tr>
+                <th>ID</th>
+                <th>Description</th>
+                <th>Zipcode</th>
+                <th>Num_Guests</th>
+                <th>Price</th>
+                <th>Landlord</th>
+                <th>Safety Rating</th>
+                <th>Operation</th>
+            </tr>
+            {% for apartment in results %}
+                <tr>
+                    <td>{{ apartment[0] }}</td>
+                    <td>{{ apartment[1] }}</td>
+                    <td>{{ apartment[2] }}</td>
+                    <td>{{ apartment[3] }}</td>
+                    <td>{{ apartment[4] }}</td>
+                    <td>{{ apartment[5] }}</td>
+                    <td>{{ apartment[6] }}</td>
+                    <td><a href="{{ url_for("update_apartment", apartment_id=apartment[0]) }}">Edit</a>/
+                        <a href="{{ url_for("delete_apartment", apartment_id=apartment[0]) }}">Delete</a></td>
+                </tr>
+            {% endfor %}
+          </table>
+        </div>
 
 
 </div>

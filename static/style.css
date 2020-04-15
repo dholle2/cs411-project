@@ -8,12 +8,14 @@ a:hover {
 /* Custom default button */
 .btn-default,
 .btn-default:hover,
-.btn-default:focus {
+.btn-default:focus,
+.btn-default:active,
+.btn-defuault:visited {
   /* color: #333; */
   color: #e66a6f;
   text-shadow: none; /* Prevent inheritence from `body` */
-  background-color: #fff;
-  border: 1px solid #fff;
+  background-color: #e3e4e6 !important;
+  border: 1px solid #e3e4e6 !important;
 }
 
 
@@ -31,6 +33,11 @@ body {
   color: #fff;
   text-align: center;
   text-shadow: 0 1px 3px rgba(0,0,0,.5);
+}
+
+.btn-primary {
+  color: #f3b1b2 !important;
+  background-color: #f3b1b2 !important;
 }
 
 /* Extra markup and styles for table-esque vertical and horizontal centering */
@@ -61,6 +68,9 @@ body {
 /*
  * Header
  */
+ .container-bg {
+   background-color: #fff;
+ }
 .masthead-brand {
   margin-top: 10px;
   margin-bottom: 10px;
@@ -79,11 +89,12 @@ body {
   font-weight: bold;
   color: #fff; /* IE8 proofing */
   color: rgba(255,255,255,.75);
-  border-bottom: 2px solid transparent;
+  /* border-bottom: 2px solid transparent; */
+  border-bottom: 2px solid
 }
 .masthead-nav > li > a:hover,
 .masthead-nav > li > a:focus {
-  background-color: transparent;
+  /* background-color: transparent; */
   border-bottom-color: #a9a9a9;
   border-bottom-color: rgba(255,255,255,.25);
 }

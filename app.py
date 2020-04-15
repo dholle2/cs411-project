@@ -16,7 +16,7 @@ app.config['MYSQL_HOST'] = db['mysql_host']
 app.config['MYSQL_USER'] = db['mysql_user']
 app.config['MYSQL_PASSWORD'] = db['mysql_password']
 app.config['MYSQL_DB'] = db['mysql_db']
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@127.0.0.1/airbnb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:pass@127.0.0.1/airbnb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 #app.config.from_pyfile('config.conf')
 

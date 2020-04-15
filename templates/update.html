@@ -21,44 +21,64 @@
               <ul class="nav masthead-nav">
                 <li class="active"><a href="/">Home</a></li>
                 <li><a href="user_search.html">User Side</a></li>
-                <li><a href="admin_search.html">Admin Side</a></li>
+                <li><a href="../">Admin Side</a></li>
               </ul>
             </nav>
           </div>
         </div>
-    <div class="container">
-      <form method="POST" action="">
-        <div class="form-group">
-          <label for="IDInput">ID</label>
-          <input type="text" type="form-control" id="IDInput" name="ID" value="{{ apartment[0] }}">
+
+        <div class="container w-50 p-3">
+          <h4> Update Listing </h4>
+          <br/>
+          <form class="form-horizontal" method="POST" action="">
+            <div class="form-group row">
+              <label for="IDInput" class="col-sm-4 control-label">ID</label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" id="IDInput" name="ID" value="{{ apartment[0] }}">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="descriptionInput" class="col-sm-4 control-label">Description</label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" id="descriptionInput" name="description" value="{{ apartment[1] }}">
+                <!-- <textarea class="form-control" rows="3" placeholder="Description"></textarea> -->
+              </div>
+            </div>
+           <div class="form-group row">
+             <label for="zipcodeInput" class="col-sm-4 control-label">Zipcode</label>
+             <div class="col-sm-8">
+               <input type="int" class="form-control" id="zipcodeInput" name="zipcode" value="{{ apartment[2] }}">
+             </div>
+           </div>
+           <div class="form-group row">
+             <label for="numGuestsInput" class="col-sm-4 control-label">Number of Guests</label>
+             <div class="col-sm-8">
+               <input type="int" class="form-control" id="numGuestsInput" name="guest" value="{{ apartment[3] }}">
+             </div>
+           </div>
+           <div class="form-group row">
+             <label for="priceInput" class="col-sm-4 control-label">Price</label>
+             <div class="col-sm-8">
+               <input type="int" class="form-control" name="price" value="{{ apartment[4] }}"/>
+             </div>
+           </div>
+           <div class="form-group row">
+             <label for="landlordInput" class="col-sm-4 control-label">Landlord</label>
+             <div class="col-sm-8">
+               <input type="text" class="form-control" id="landlordInput" name="landlord" value="{{ apartment[5] }}">
+             </div>
+           </div>
+           <div class="form-group row">
+             <label for="safetyInput" class="col-sm-4 control-label">Safety Rating</label>
+             <div class="col-sm-8">
+               <input type="int" class="form-control" id="safetyInput" name="safety" value="{{ apartment[6] }}">
+             </div>
+           </div>
+<!-- <input type="submit" name="search_listing" value="search_listing"> -->
+           <input type="submit" class="btn btn-primary" name="update_listing" value="Update Listing"/>
+         </form>
         </div>
-        <div class="form-group">
-          <label for="descriptionInput">Description</label>
-          <input type="text" type="form-control" id="descriptionInput" name="description" value="{{ apartment[1] }}">
-        </div>
-        <div class="form-group">
-          <label for="zipcodeInput">Zipcode</label>
-          <input type="int" type="form-control" id="zipcodeInput" name="zipcode" value="{{ apartment[2] }}">
-        </div>
-        <div class="form-group">
-          <label for="numGuestsInput">Number of Guests</label>
-          <input type="int" type="form-control" id="numGuestsInput" name="guest" value="{{ apartment[3] }}">
-        </div>
-        <div class="form-group">
-          <label for="priceInput">Price</label>
-          <input type="int" type="form-control" id="priceInput" name="price" value="{{ apartment[4] }}">
-        </div>
-        <div class="form-group">
-          <label for="landlordInput">Landlord</label>
-          <input type="text" type="form-control" id="landlordInput" name="landlord" value="{{ apartment[5] }}">
-        </div>
-        <div class="form-group">
-          <label for="safetyInput">Safety Rating</label>
-          <input type="int" type="form-control" id="safetyInput" name="safety" value="{{ apartment[6] }}">
-        </div>
-        <input type="submit">
-      </form>
-  </div>
+      </div>
 
 </div>
 </div>

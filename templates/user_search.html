@@ -15,8 +15,7 @@
    <div class="site-wrapper-inner">
   <!-- navbar -->
   <div class="container">
-
-    <div class="masthead clearfix">
+    <div class="masthead">
       <div class="container inner">
         <h3 class="masthead-brand">Home</h3>
         <nav>
@@ -29,61 +28,81 @@
       </div>
     </div>
    </div>
-    <div class="container">
-       <form method="POST" action="">
-        <div class="form-group">
-          <label for="zipcodeInput">Zipcode</label>
-          <input type="int" type="form-control" id="zipcodeInput" name="zipcode">
+
+   <br/><br/><br/><br/><br/><br/>
+
+   <div class="row no-gutter">
+   <!-- search for listings -->
+     <div class="container w-50 p-3">
+       <h4> Search For Listings </h4>
+       <br/>
+       <form class="form-horizontal" method="POST" action="">
+        <div class="form-group row">
+          <label for="zipcodeInput" class="col-sm-4 control-label">Zipcode</label>
+          <div class="col-sm-8">
+            <input type="int" class="form-control" id="zipcodeInput" placeholder="Zipcode" name="zipcode">
+          </div>
         </div>
-        <div class="form-group">
-          <label for="numGuestsInput">Number of Guests</label>
-          <input type="int" type="form-control" id="numGuestsInput" name="guest">
+        <div class="form-group row">
+          <label for="numGuestsInput" class="col-sm-4 control-label">Number of Guests</label>
+          <div class="col-sm-8">
+            <input type="int" class="form-control" id="numGuestsInput" placeholder="Number of Guests" name="guest">
+          </div>
         </div>
-        <div class="form-group">
-          <label for="priceInput">Price</label>
-          from <input type="int" type="form-control" id="priceInput" name="lowerprice">
-          to <input type="int" type="form-control" id="priceInput" name="upperprice">
+        <div class="form-group row">
+          <label for="priceInput" class="col-sm-4 control-label">Price</label>
+          <div class="col">
+            <input type="int" class="form-control" id="priceInput" placeholder="Lower price" name="lowerprice">
+          </div>
+          <label> to </label>
+          <div class="col">
+            <input type="int" class="form-control" id="priceInput" placeholder="Upper price" name="upperprice">
+          </div>
         </div>
-        <div class="form-group">
-          <label for="safetyInput">Safety Rating</label>
-          from<input type="int" type="form-control" id="safetyInput" name="safety">
+        <div class="form-group row">
+          <label for="safetyInput" class="col-sm-4 control-label">Safety Rating from</label>
+          <div class="col-sm-8">
+            <input type="int" class="form-control" id="safetyInput" placeholder="Safety Rating" name="rating">
+          </div>
         </div>
-        <div class="form-group">
-          <label for="landlordInput">Landlord</label>
-          <input type="text" type="form-control" id="landlordInput" name="landlord">
-        </div>
-         <div class="form-group">
-          <label for="descriptionInput">Description</label>
-          <input type="text" type="form-control" id="descriptionInput" name="description">
-        </div>
-        <input type="submit" name="search_listing" value="search_listing">
+        <br/>
+        <!-- <input type="submit" name="search_listing" value="search_listing"> -->
+        <input type="submit" class="btn btn-primary" name="search_listing" value="Search For Listings"/>
       </form>
-    </div>
-           <table>
-                <tr>
-                    <th>ID</th>
-                    <th>Description</th>
-                    <th>Zipcode</th>
-                    <th>Num_Guests</th>
-                    <th>Price</th>
-                    <th>Landlord</th>
-                    <th>Safety Rating</th>
-                </tr>
-                    {% for apartment in results %}
-                        <tr>
-                            <td>{{ apartment[0] }}</td>
-                            <td>{{ apartment[1] }}</td>
-                            <td>{{ apartment[2] }}</td>
-                            <td>{{ apartment[3] }}</td>
-                            <td>{{ apartment[4] }}</td>
-                            <td>{{ apartment[5] }}</td>
-                            <td>{{ apartment[6] }}</td>
-                        </tr>
-                    {% endfor %}
-            </table>
+     </div>
+   </div>
+
+   <div class="container">
+     <table>
+      <tr>
+        <th>ID</th>
+        <th>Description</th>
+        <th>Zipcode</th>
+        <th>Num_Guests</th>
+        <th>Price</th>
+        <th>Landlord</th>
+        <th>Safety Rating</th>
+      </tr>
+        {% for apartment in results %}
+            <tr>
+                <td>{{ apartment[0] }}</td>
+                <td>{{ apartment[1] }}</td>
+                <td>{{ apartment[2] }}</td>
+                <td>{{ apartment[3] }}</td>
+                <td>{{ apartment[4] }}</td>
+                <td>{{ apartment[5] }}</td>
+                <td>{{ apartment[6] }}</td>
+            </tr>
+        {% endfor %}
+      </table>
+   </div>
+
+   <br/><br/><br/><br/>
+
 
   </div>
 </div>
+
 
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
