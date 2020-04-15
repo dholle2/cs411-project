@@ -51,11 +51,29 @@
               <div class="container">
                 <h4> Insert New Listing </h4>
                 <br/>
-                <form class="form-horizontal" method="POST" action="">
+                <form class="form-horizontal" method="POST" action="" id="insert_form">
+                  <div class="form-group row">
+                    <label for="landlordInput" class="col-sm-4 control-label">Landlord</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" id="landlordInput" placeholder="Landlord" name="landlord">
+                    </div>
+                  </div>
+                   <div class="form-group row">
+                    <label for="descriptionInput" class="col-sm-4 control-label">Description</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" id="descriptionInput" maxlength="200" placeholder="Description" name="description">
+                    </div>
+                  </div>
                  <div class="form-group row">
-                   <label for="zipcodeInput" class="col-sm-4 control-label">Zipcode</label>
+                   <label for="latitudeInput" class="col-sm-4 control-label">Latitude</label>
                    <div class="col-sm-8">
-                     <input type="int" class="form-control" id="zipcodeInput" placeholder="Zipcode" name="zipcode">
+                     <input type="int" class="form-control" id="latitudeInput" placeholder="Latitude" name="latitude">
+                   </div>
+                 </div>
+                 <div class="form-group row">
+                   <label for="longitudeInput" class="col-sm-4 control-label">Longitude</label>
+                   <div class="col-sm-8">
+                     <input type="int" class="form-control" id="longitudeInput" placeholder="Longitude" name="longitude">
                    </div>
                  </div>
                  <div class="form-group row">
@@ -67,7 +85,7 @@
                  <div class="form-group row">
                    <label for="priceInput" class="col-sm-4 control-label">Price</label>
                    <div class="col-sm-8">
-                     <input type="int" class="form-control" placeholder="Price" name="price"/>
+                     <input type="int" class="form-control" id="priceInput" placeholder="Price" name="price">
                    </div>
                  </div>
                  <div class="form-group row">
@@ -76,20 +94,8 @@
                      <input type="int" class="form-control" id="safetyInput" placeholder="Safety Rating" name="safety_rating">
                    </div>
                  </div>
-                 <div class="form-group row">
-                   <label for="landlordInput" class="col-sm-4 control-label">Landlord</label>
-                   <div class="col-sm-8">
-                     <input type="text" class="form-control" id="landlordInput" placeholder="Landlord" name="landlord">
-                   </div>
-                 </div>
-                  <div class="form-group row">
-                   <label for="descriptionInput" class="col-sm-4 control-label">Description</label>
-                   <div class="col-sm-8">
-                     <input type="text" class="form-control" id="descriptionInput" placeholder="Description" name="description">
-                   </div>
-                 </div>
                  <!-- <input type="submit" name="search_listing" value="search_listing"> -->
-                 <input type="submit" class="btn btn-primary" name="new_listing" value="Insert New Listing"/>
+                 <input type="submit" class="btn btn-primary" id="new_listing" name="new_listing" value="Insert New Listing">
                </form>
               </div>
             </div>
@@ -99,12 +105,18 @@
               <h4> Search For Listings </h4>
               <br/>
               <form class="form-horizontal" method="POST" action="">
-               <div class="form-group row">
-                 <label for="zipcodeInput" class="col-sm-4 control-label">Zipcode</label>
-                 <div class="col-sm-8">
-                   <input type="int" class="form-control" id="zipcodeInput" placeholder="Zipcode" name="zipcode">
-                 </div>
-               </div>
+                <div class="form-group row">
+                  <label for="latitudeInput" class="col-sm-4 control-label">Latitude</label>
+                  <div class="col-sm-8">
+                    <input type="int" class="form-control" id="latitudeInput" placeholder="Latitude" name="latitude">
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="longitudeInput" class="col-sm-4 control-label">Longitude</label>
+                  <div class="col-sm-8">
+                    <input type="int" class="form-control" id="longitudeInput" placeholder="Longitude" name="longitude">
+                  </div>
+                </div>
                <div class="form-group row">
                  <label for="numGuestsInput" class="col-sm-4 control-label">Number of Guests</label>
                  <div class="col-sm-8">
@@ -135,12 +147,20 @@
           </div>
         </div>
 
+        <!-- choose file -->
+        <!-- <input type="file" id="file-input" /> -->
+        <ul id="list" style="list-style-type: none">
+        </ul>
+
+        <!-- result table -->
         <div class="container">
           <table>
             <tr>
                 <th>ID</th>
                 <th>Description</th>
-                <th>Zipcode</th>
+                <!-- <th>Zipcode</th> -->
+                <th>Latitude</th>
+                <th>Longitude</th>
                 <th>Num_Guests</th>
                 <th>Price</th>
                 <th>Landlord</th>
@@ -156,17 +176,64 @@
                     <td>{{ apartment[4] }}</td>
                     <td>{{ apartment[5] }}</td>
                     <td>{{ apartment[6] }}</td>
+                    <td>{{ apartment[7] }}</td>
                     <td><a href="{{ url_for("update_apartment", apartment_id=apartment[0]) }}">Edit</a>/
                         <a href="{{ url_for("delete_apartment", apartment_id=apartment[0]) }}">Delete</a></td>
                 </tr>
             {% endfor %}
           </table>
         </div>
-
-
-</div>
-</div>
-</div>
-
+      </div>
+    </div>
+  </div>
 </body>
 </html>
+
+<script lang="javascript" src="{{ url_for('static', filename='node_modules/xlsx-style/dist/xlsx.core.min.js') }}"></script>
+
+<script>
+ function handleFile(e) {
+   var files = e.target.files, f = files[0];
+   var reader = new FileReader();
+   reader.onload = function(e) {
+
+   var data = new Uint8Array(e.target.result);
+   var workbook = XLSX.read(data, {type: 'array'});
+   var worksheet = workbook.Sheets[workbook.SheetNames[0]];
+   let name;
+   let description;
+   let latitude;
+   let longitude;
+   let guests;
+   let price;
+   let addall = 'db2.session.add_all(['
+   for(let i = 2; i < 324; i++){ //324 rows of data, row 1 is labels
+       name = 'A' + i;
+       description = 'B' + i;
+       latitude = 'C' + i;
+       longitude = 'D' + i;
+       guests = 'E' + i;
+       price = 'F' + i;
+
+       addall = addall + 'ap' + i + ',';
+
+       let list = document.getElementById("list");
+       // ap3 = Apartment(ID=3, Description='great', Zipcode=91798, NumGuests=2, Price=500, Landlord='Mike', SafetyRating=5.3)
+       let x = 'ap' + i + ' = Apartment(ID=' + (i - 1) + ', Description=\'' + worksheet[description].v
+        + '\', Latitude=' + worksheet[latitude].v + ', Longitude=' + worksheet[longitude].v + ', NumGuests=' + worksheet[guests].v
+        + ', Price=' + worksheet[price].v + ', Landlord=\'' + worksheet[name].v + '\', SafetyRating=0.0)';
+      let entry = document.createElement("li");
+      entry.appendChild(document.createTextNode(x));
+      list.appendChild(entry);
+   }
+
+   addall = addall + '])';
+   let entry = document.createElement("li");
+   entry.appendChild(document.createTextNode(addall));
+   list.appendChild(entry);
+   };
+   reader.readAsArrayBuffer(f);
+ }
+ document.getElementById('file-input').addEventListener('change', handleFile, false);
+
+</script>
