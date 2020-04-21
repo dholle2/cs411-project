@@ -4,6 +4,8 @@ from flask_mysqldb import MySQL
 from flask_bootstrap import Bootstrap
 import yaml
 from flask_sqlalchemy import SQLAlchemy
+from flask_pymongo import PyMongo
+import re
 #from sqlalchemy import or_,and_
 
 #import sys
@@ -16,14 +18,21 @@ app.config['MYSQL_HOST'] = db['mysql_host']
 app.config['MYSQL_USER'] = db['mysql_user']
 app.config['MYSQL_PASSWORD'] = db['mysql_password']
 app.config['MYSQL_DB'] = db['mysql_db']
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:pass@127.0.0.1/airbnb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@127.0.0.1/airbnb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# mongodb
+app.config['MONGO_URI'] = 'mongodb+srv://user1:user1password@cluster0-9dppt.mongodb.net/crimedata?retryWrites=true&w=majority'
 #app.config.from_pyfile('config.conf')
 
 mysql = MySQL(app)
+mongo = PyMongo(app)
+crimes = mongo.db['crimes']
 CORS(app)
 # Bootstrap(app)
 db2 = SQLAlchemy(app)
+#mongo.db.users.insert({'name':name, 'email':email})
+#mongo.db.users.find({"online": True})
+
 
 #create table
 class Apartment(db2.Model):
@@ -41,10 +50,75 @@ class Apartment(db2.Model):
 
     def __repr__(self):
         return 'Apartment ID: %s Landord: %s' % (self.ID, self.Landlord)
+"""
+#search
+mycol = mongo.db[collection_name]
+mycol.find_one(conditions_dic)
+mycol.find(conditions_dic).sort([order_rule]).skip(page_num*(page_num-1)).limit(page_size)
+#update
+mycol.update(conditions_dic,{'$set':data_dic}, multi=multi_field_update)
+mycol.update(conditions_dic, {'$set': data_dic})
+#insert
+mycol.insert(data_dic)
+delete
+mycol.delete_many
+mycol.delete_one
+"""
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+# mongodb CRUD
+@app.route('/admin_mongo.html', methods=['GET', 'POST'])
+def admin_mongo():
+    results = []
+    if request.method == 'POST':
+        if 'search_listing' in request.form:
+            ID = request.form.get('ID')
+            caseNo = request.form.get('caseNo')
+            datetime = request.form.get('datetime')
+            type = request.form.get('type')
+            condition = {}
+            if caseNo:
+                condition['Case Number'] = caseNo
+            if ID:
+                condition['ID'] = int(ID)
+            if datetime:
+                condition['Date'] = datetime
+            if type:
+                condition['Primary Type'] = type
+            resultsDetails=crimes.find(condition).limit(100)
+            return render_template('admin_mongo.html', results=resultsDetails)
+        if 'new_listing' in request.form:
+            ID = request.form.get('ID')
+            caseNo = request.form.get('caseNo')
+            datetime = request.form.get('datetime')
+            type = request.form.get('type')
+            latitude = request.form.get('latitude')
+            longitude = request.form.get('longitude')
+            crimes.insert({'ID': int(ID), 'Case Number': caseNo, 'Date':datetime, 'Primary Type':type,'Latitude': float(latitude), 'Longitude': float(longitude)})
+    return render_template('admin_mongo.html', results=results)
+
+@app.route('/admin_mongo.html/delete/<crime_id>')
+def delete_crime(crime_id):
+    crimes.remove({'ID':int(crime_id)})
+    return redirect(url_for('admin_mongo'))
+
+@app.route('/admin_mongo.html/update/<crime_id>', methods=['GET', 'POST'] )
+def update_crime(crime_id):
+    crime=crimes.find({'ID': int(crime_id)})
+    if request.method == 'POST':
+        ID = request.form.get('ID')
+        caseNo = request.form.get('caseNo')
+        datetime = request.form.get('datetime')
+        type = request.form.get('type')
+        latitude = request.form.get('latitude')
+        longitude = request.form.get('longitude')
+        #mycol.update(conditions_dic, {'$set': data_dic})
+        crimes.update({'ID': int(crime_id)}, {'$set':{'ID': int(ID), 'Case Number': caseNo, 'Date':datetime, 'Primary Type':type,'Latitude': float(latitude), 'Longitude': float(longitude)}})
+        return redirect(url_for('admin_mongo'))
+    return render_template('mongo_update.html', crime=crime)
 
 #search & insert
 @app.route('/admin_search.html', methods=['GET', 'POST'])
