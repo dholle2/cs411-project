@@ -1,10 +1,18 @@
-from flask import Flask, render_template, request, redirect, jsonify, url_for
+from typing import Union
+
+from flask import Flask, render_template, request, redirect, jsonify, url_for, flash, get_flashed_messages
 from flask_cors import CORS
 from flask_mysqldb import MySQL
 from flask_bootstrap import Bootstrap
 import yaml
 from flask_sqlalchemy import SQLAlchemy
 from flask_pymongo import PyMongo
+from pygeodesy import ellipsoidalVincenty as ev
+from pymongo import MongoClient
+import pymysql
+import pandas as pd
+from sodapy import Socrata
+from datetime import datetime
 import re
 #from sqlalchemy import or_,and_
 
@@ -14,6 +22,7 @@ import re
 
 db = yaml.load(open('db.yaml'))
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'cs411'
 app.config['MYSQL_HOST'] = db['mysql_host']
 app.config['MYSQL_USER'] = db['mysql_user']
 app.config['MYSQL_PASSWORD'] = db['mysql_password']
@@ -26,7 +35,7 @@ app.config['MONGO_URI'] = 'mongodb+srv://user1:user1password@cluster0-9dppt.mong
 
 mysql = MySQL(app)
 mongo = PyMongo(app)
-crimes = mongo.db['crimes']
+crimes = mongo.db['crimeRecords']
 CORS(app)
 # Bootstrap(app)
 db2 = SQLAlchemy(app)
@@ -65,58 +74,202 @@ mycol.delete_many
 mycol.delete_one
 """
 
+def cal_safety(apartment:list, crimes:list):
+    """
+    To calculate safety rating of apartment
+    :param apartment: a row from table apartment in list format
+    :param crimes: a collection in list format
+    :return:
+    """
+
+    crime_score = {'ARSON': 8, 'ASSAULT': 8, 'BATTERY': 8, 'BURGLARY': 7, 'CONCEALED CARRY LICENSE VIOLATION': 5,
+                   'CRIM SEXUAL ASSAULT': 8, 'CRIMINAL DAMAGE': 5, 'CRIMINAL SEXUAL ASSAULT': 8, 'CRIMINAL TRESPASS': 7,
+                   'DECEPTIVE PRACTICE': 5, 'GAMBLING': 5, 'HOMICIDE': 10, 'HUMAN TRAFFICKING': 9,
+                   'INTERFERENCE WITH PUBLIC OFFICER': 5,
+                   'INTIMIDATION': 7, 'KIDNAPPING': 9, 'LIQUOR LAW VIOLATION': 3, 'MOTOR VEHICLE THEFT': 5,
+                   'NARCOTICS': 6,
+                   'OBSCENITY': 5, 'OFFENSE INVOLVING CHILDREN': 8, 'OTHER NARCOTIC VIOLATION': 6, 'OTHER OFFENSE': 5,
+                   'PROSTITUTION': 5, 'PUBLIC INDECENCY': 5, 'PUBLIC PEACE VIOLATION': 5, 'ROBBERY': 6,
+                   'SEX OFFENSE': 7,
+                   'STALKING': 6, 'THEFT': 5, 'WEAPONS VIOLATION': 5, 'PUBLIC PEACE VIOLATION': 7, 'RITUALISM': 5,
+                   'NON-CRIMINAL': 1, 'CRIMINAL ABORTION': 1
+                   }
+    total_score = 0
+    for crime in crimes:
+        start = ev.LatLon(apartment[2], apartment[3])
+        end = ev.LatLon(crime['latitude'], crime['longitude'])
+        distance = float(start.distanceTo(end))  # meter
+        if distance > 3000:
+            continue
+        base_score = crime_score[crime['primary_type']]
+        arrest_leverage = 1 if crime['arrest'] else 1.5
+        '''     
+        if crime['frequency'] > 5:
+            fre_leverage = 2
+        elif crime['frequency'] <= 2:
+            fre_leverage = 1
+        else:
+            fre_leverage = 1.5
+        score = base_score * arrest_leverage * fre_leverage
+        '''
+        score = base_score * arrest_leverage * crime['frequency']
+        total_score += score
+    rating = round(10 - total_score / 100, 2)
+    return rating
+
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/database.html')
+def database():
+    return render_template('database.html')
+
+@app.route('/admin_mongo.html/calculate')
+def reset_safety():
+    cur = mysql.connection.cursor()
+    results = cur.execute("SELECT * FROM apartment")
+    if results > 0:
+        resultsDetails = cur.fetchall()
+    crime_records = list(crimes.find({}))
+    for apartment in resultsDetails:
+        rating = cal_safety(apartment, crime_records)
+        cur.execute("update apartment set SafetyRating = %s where ID = %s", (rating, apartment[0]))
+        mysql.connection.commit()
+    cur.close()
+    flash('Calculation Completed')
+    return redirect(url_for('admin_mongo'))
+
+@app.route('/admin_mongo.html/import')
+def import_data():
+    client = Socrata("data.cityofchicago.org", None)
+    results = client.get("qzdf-xmn8", limit=1000)
+    results_df = pd.DataFrame.from_records(results,
+                                           exclude=['location', 'district', 'block', 'y_coordinate', 'description',
+                                                    'location_description', 'updated_on', 'community_area',
+                                                    'iucr', 'x_coordinate', 'ward', 'year', 'domestic', 'fbi_code',
+                                                    'beat', 'id'])
+    # convert datatype
+    results_df['date'] = results_df['date'].str.slice(0, 10)
+    # results_df['date'] = pd.to_datetime(results_df['date'].str.slice(0,10))
+    results_df['latitude'] = results_df['latitude'].astype(float)
+    results_df['longitude'] = results_df['longitude'].astype(float)
+    results_df['case_number'] = results_df['case_number'].astype(str)
+    results_df['primary_type'] = results_df['primary_type'].astype(str)
+    results_df.dropna(axis=0, how='any', inplace=True)
+    results_group = results_df.groupby(['latitude', 'longitude', 'primary_type', 'arrest'])
+    crime_records = []
+    i = 1
+    for k, v in results_group:
+        each_record = {}
+        detail = []
+        each_record['_id'] = i
+        i += 1
+        each_record['latitude'] = k[0]
+        each_record['longitude'] = k[1]
+        each_record['primary_type'] = k[2]
+        each_record['arrest'] = k[3]
+        each_record['frequency'] = v.shape[0]
+        for j in range(v.shape[0]):
+            each_crime = {}
+            each_crime['case_number'] = v.iloc[j, 2]
+            # each_crime['date']=pd.Timestamp.date(v.iloc[j,0])
+            each_crime['date'] = datetime.strptime(v.iloc[j, 0], '%Y-%m-%d')
+            # each_crime['date'] = v.iloc[j,0]
+            detail.append(each_crime)
+            each_record['detail'] = detail
+        crime_records.append(each_record)
+    crimes.delete_many({})
+    crimes.insert_many(crime_records)
+    flash('Finished')
+    return redirect(url_for('admin_mongo'))
+
 
 # mongodb CRUD
 @app.route('/admin_mongo.html', methods=['GET', 'POST'])
 def admin_mongo():
     results = []
+    bool = {'yes':True, 'no':False}
     if request.method == 'POST':
         if 'search_listing' in request.form:
             ID = request.form.get('ID')
-            caseNo = request.form.get('caseNo')
-            datetime = request.form.get('datetime')
+            latitude = request.form.get('latitude')
+            longitude = request.form.get('longitude')
             type = request.form.get('type')
+            arrest = request.form.get('arrest')
+            frequency = request.form.get('frequency')
+            #caseNo = request.form.get('caseNo')
+            #date = request.form.get('date')
+
             condition = {}
-            if caseNo:
-                condition['Case Number'] = caseNo
             if ID:
-                condition['ID'] = int(ID)
-            if datetime:
-                condition['Date'] = datetime
+                condition['_id'] = int(ID)
+            if latitude:
+                condition['latitude'] = float(latitude)
+            if longitude:
+                condition['longitude'] = float(longitude)
+            #if caseNo:
+                #condition['Case Number'] = caseNo
+            #if date:
+                #condition['Date'] = date
             if type:
-                condition['Primary Type'] = type
-            resultsDetails=crimes.find(condition).limit(100)
+                condition['primary_type'] = type
+            if arrest:
+                condition['arrest'] = bool[arrest]
+                #condition['arrest'] = True
+            if frequency:
+                condition['frequency'] = int(frequency)
+            resultsDetails=crimes.find(condition)
             return render_template('admin_mongo.html', results=resultsDetails)
         if 'new_listing' in request.form:
             ID = request.form.get('ID')
-            caseNo = request.form.get('caseNo')
-            datetime = request.form.get('datetime')
-            type = request.form.get('type')
             latitude = request.form.get('latitude')
             longitude = request.form.get('longitude')
-            crimes.insert({'ID': int(ID), 'Case Number': caseNo, 'Date':datetime, 'Primary Type':type,'Latitude': float(latitude), 'Longitude': float(longitude)})
+            type = request.form.get('type')
+            arrest = request.form.get('arrest')
+            frequency = request.form.get('frequency')
+            caseNo = request.form.getlist('caseNo')
+            date = request.form.getlist('date')
+            detail = []
+            for i in range(len(caseNo)):
+                record = {}
+                if caseNo[i] and date[i]:
+                    record['case_number'] = caseNo[i]
+                    record['date'] = datetime.strptime(date[i], '%Y-%m-%d')
+                    detail.append(record)
+            crimes.insert({'_id': int(ID), 'latitude': float(latitude), 'longitude': float(longitude), 'primary_type':type,
+                           'arrest': bool[arrest], 'frequency':int(frequency), 'detail': detail})
     return render_template('admin_mongo.html', results=results)
 
 @app.route('/admin_mongo.html/delete/<crime_id>')
 def delete_crime(crime_id):
-    crimes.remove({'ID':int(crime_id)})
+    crimes.remove({'_id':int(crime_id)})
     return redirect(url_for('admin_mongo'))
 
 @app.route('/admin_mongo.html/update/<crime_id>', methods=['GET', 'POST'] )
 def update_crime(crime_id):
-    crime=crimes.find({'ID': int(crime_id)})
+    crime=crimes.find({'_id': int(crime_id)})
+    bool = bool = {'yes':True, 'no':False, 'true':True, 'false':False}
     if request.method == 'POST':
         ID = request.form.get('ID')
-        caseNo = request.form.get('caseNo')
-        datetime = request.form.get('datetime')
-        type = request.form.get('type')
         latitude = request.form.get('latitude')
         longitude = request.form.get('longitude')
-        #mycol.update(conditions_dic, {'$set': data_dic})
-        crimes.update({'ID': int(crime_id)}, {'$set':{'ID': int(ID), 'Case Number': caseNo, 'Date':datetime, 'Primary Type':type,'Latitude': float(latitude), 'Longitude': float(longitude)}})
+        type = request.form.get('type')
+        arrest = request.form.get('arrest').lower()
+        frequency = request.form.get('frequency')
+        caseNo = request.form.getlist('caseNo')
+        date = request.form.getlist('date')
+        detail = []
+        for i in range(len(caseNo)):
+            record = {}
+            if caseNo[i] and date[i]:
+                record['case_number'] = caseNo[i]
+                record['date'] = datetime.strptime(date[i][0:10], '%Y-%m-%d')
+                detail.append(record)
+        crimes.update({'_id': int(crime_id)}, {'$set':{'_id': int(ID), 'latitude': float(latitude), 'longitude': float(longitude), 'primary_type':type,
+                          'arrest': bool[arrest], 'frequency':int(frequency), 'detail': detail}})
         return redirect(url_for('admin_mongo'))
     return render_template('mongo_update.html', crime=crime)
 
@@ -124,6 +277,13 @@ def update_crime(crime_id):
 @app.route('/admin_search.html', methods=['GET', 'POST'])
 def admin_search():
     results = []
+    #latitude = request.form.get('latitude')
+    #longitude = request.form.get('longitude')
+    #flash(str(longitude))
+
+    latitude2 = request.values.get('latitudeInsert','')
+    longitude2 = request.values.get('longitudeInsert','')
+    flash(latitude2)
     if request.method == 'POST':
         if 'search_listing' in request.form:
             # zipcode = request.form.get('zipcode')
@@ -141,6 +301,12 @@ def admin_search():
             # if zipcode:
             #     condition.append("Zipcode=%s")
             #     para.append(int(zipcode))
+            if latitude:
+                condition.append("Latitude=%s")
+                para.append(float(latitude))
+            if longitude:
+                condition.append("Longitude=%s")
+                para.append((float(longitude)))
             if guest:
                 condition.append("NumGuests=%s")
                 para.append(int(guest))
@@ -175,14 +341,25 @@ def admin_search():
             num_guests = listingDetails['num_guests']
             price = listingDetails['price']
             landlord = listingDetails['landlord']
-            safety_rating = listingDetails['safety_rating']
+            safety_rating = listingDetails['safety']
 
             cur = mysql.connection.cursor()
             # cur.execute("INSERT INTO apartment VALUES(null, %s, %s, %s, %s, %s, %s)", (str(description), zipcode, num_guests, price, str(landlord), safety_rating))
             cur.execute("INSERT INTO apartment VALUES(null, %s, %s, %s, %s, %s, %s, %s)", (str(description), latitude, longitude, num_guests, price, str(landlord), safety_rating))
             mysql.connection.commit()
             cur.close()
-    return render_template('admin_search.html', results=results)
+    return render_template('admin_search.html', results=results, lati=latitude2, longi=longitude2)
+
+@app.route('/user_search.html/<latitude>&<longitude>')
+def coordinate_safety(latitude, longitude):
+    if latitude and longitude:
+        crime_records = list(crimes.find({}))
+        apartment = [0, 0, float(latitude), float(longitude)]
+        rating = cal_safety(apartment, crimes=crime_records)
+        flash('The safety rating of coordinate ({}, {}) is {}'.format(latitude,longitude, rating))
+    else:
+        flash('Please input valid coordinate')
+    return redirect(url_for('admin_search'))
 
 # search
 @app.route('/user_search.html', methods=['GET', 'POST'])
@@ -197,7 +374,7 @@ def user_search():
         upperprice = request.form.get('upperprice')
         safety = request.form.get('safety')
         landlord = request.form.get('landlord')
-        description = request.form.get('description')
+        #description = request.form.get('description')
         id=''
         condition = ["ID != %s"]
         para = [id]
@@ -219,9 +396,9 @@ def user_search():
         if landlord:
             condition.append("Landlord  LIKE %s")
             para.append('%'+landlord+'%')
-        if description:
-            condition.append("Description LIKE %s")
-            para.append('%'+description+'%')
+        #if description:
+            #condition.append("Description LIKE %s")
+            #para.append('%'+description+'%')
         cur = mysql.connection.cursor()
         results = cur.execute("SELECT * FROM apartment WHERE " + " AND ".join(condition), para)
         if results > 0:
@@ -235,7 +412,7 @@ def user_search():
 @app.route('/admin_search.html/delete/<apartment_id>')
 def delete_apartment(apartment_id):
     cur = mysql.connection.cursor()
-    cur.execute("DELETE FROM apartment WHERE ID=(%s)", (apartment_id))
+    cur.execute("DELETE FROM apartment WHERE ID=(%s)", apartment_id)
     mysql.connection.commit()
     cur.close()
     return redirect(url_for('admin_search'))
@@ -244,7 +421,7 @@ def delete_apartment(apartment_id):
 @app.route('/admin_search.html/update/<apartment_id>', methods=['GET', 'POST'] )
 def update_apartment(apartment_id):
     cur = mysql.connection.cursor()
-    results = cur.execute("SELECT * FROM apartment WHERE ID=%s", (apartment_id))
+    results = cur.execute("SELECT * FROM apartment WHERE ID=%s", apartment_id)
     apartment=cur.fetchone()
     if request.method == 'POST':
         id = request.form.get('ID')
@@ -718,4 +895,18 @@ if __name__ == '__main__':
 
     db2.session.commit()
 
+    db3 = pymysql.connect("localhost", "root", "", "airbnb")
+    """
+    cursor = db3.cursor()
+    #cursor = mysql.connection.cursor()
+    cursor.execute("select * from apartment")
+    results = cursor.fetchall()
+    crime_records = list(crimes.find({}))
+    for apartment in results:
+        rating = cal_safety(apartment, crime_records)
+        cursor.execute("update apartment set SafetyRating = %s where ID = %s", (rating, apartment[0]))
+        db3.commit()
+    cursor.close()
+    
+    """
     app.run(debug=True)

@@ -8,6 +8,7 @@
   <title>Admin Search</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
 </head>
 <body>
   <div class="site-wrapper">
@@ -35,44 +36,63 @@
         <div class="container w-50 p-3">
           <h4> Update Listing </h4>
           <br/>
-          <form class="form-horizontal" method="POST" action="">
+          <form class="form-horizontal" id="update" method="POST" action="">
             <div class="form-group row">
               <label for="IDInput" class="col-sm-4 control-label">ID</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" id="IDInput" name="ID" value="{{ crime[0]['ID'] }}">
+                <input type="text" class="form-control" id="IDInput" name="ID" value="{{ crime[0]['_id'] }}">
               </div>
             </div>
-            <div class="form-group row">
-              <label for="caseNoInput" class="col-sm-4 control-label">Case No.</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" id="caseNoInput" name="caseNo" value="{{ crime[0]['Case Number'] }}">
-                <!-- <textarea class="form-control" rows="3" placeholder="Description"></textarea> -->
-              </div>
-            </div>
-           <div class="form-group row">
-             <label for="datetimeInput" class="col-sm-4 control-label">Datetime</label>
-             <div class="col-sm-8">
-               <input type="int" class="form-control" id="datetimeInput" name="datetime" value="{{ crime[0]['Date'] }}">
-             </div>
-           </div>
-           <div class="form-group row">
-             <label for="typeInput" class="col-sm-4 control-label">Type</label>
-             <div class="col-sm-8">
-               <input type="int" class="form-control" id="typeInput" name="type" value="{{ crime[0]['Primary Type'] }}">
-             </div>
-           </div>
            <div class="form-group row">
              <label for="latitudeInput" class="col-sm-4 control-label">Latitude</label>
              <div class="col-sm-8">
-               <input type="int" class="form-control" id="latitudeInput" name="latitude" value="{{ crime[0]['Latitude'] }}">
+               <input type="int" class="form-control" id="latitudeInput" name="latitude" value="{{ crime[0]['latitude'] }}">
              </div>
            </div>
            <div class="form-group row">
              <label for="longitudeInput" class="col-sm-4 control-label">Longitude</label>
              <div class="col-sm-8">
-               <input type="int" class="form-control" id="longitudeInput" name="longitude" value="{{ crime[0]['Longitude'] }}"/>
+               <input type="int" class="form-control" id="longitudeInput" name="longitude" value="{{ crime[0]['longitude'] }}"/>
              </div>
            </div>
+           <div class="form-group row">
+             <label for="typeInput" class="col-sm-4 control-label">Type</label>
+             <div class="col-sm-8">
+               <input type="int" class="form-control" id="typeInput" name="type" value="{{ crime[0]['primary_type'] }}">
+             </div>
+           </div>
+           <div class="form-group row">
+             <label for="arrestInput" class="col-sm-4 control-label">Arrest</label>
+             <div class="col-sm-8">
+               <input type="int" class="form-control" id="arrestInput" name="arrest" value="{{ crime[0]['arrest'] }}">
+             </div>
+           </div>
+           <div class="form-group row">
+             <label for="frequencyInput" class="col-sm-4 control-label">Frequency</label>
+             <div class="col-sm-8">
+               <input type="int" class="form-control" id="frequencyInput" name="frequency" value="{{ crime[0]['frequency'] }}">
+             </div>
+           </div>
+           {% for detail in crime[0]['detail'] %}
+                <div class="form-group row">
+                  <label for="caseNoInput" class="col-sm-4 control-label">Case No.</label>
+                  <div class="col-sm-8">
+                    <input type="text" class="form-control" id="caseNoInput" name="caseNo" value="{{ detail['case_number'] }}">
+                  </div>
+                </div>
+               <div class="form-group row">
+                 <label for="dateInput" class="col-sm-4 control-label">Date</label>
+                 <div class="col-sm-8">
+                   <input type="text" class="form-control" id="dateInput" name="date" value="{{ detail['date'] }}">
+                 </div>
+               </div>
+           {% endfor %}
+              <div style="margin: 10px">
+                  <input type="button" id='addCase' value="Add case">
+                  <input type="button" id='deleteCase' value="Delete case">
+              </div>
+
+
 <!-- <input type="submit" name="search_listing" value="search_listing"> -->
            <input type="submit" class="btn btn-primary" name="update_listing" value="Update Listing" style="font-weight: bold;
            color: white !important; background-color: #f3b1b2 !important; border: none;">
@@ -83,6 +103,39 @@
 </div>
 </div>
 </div>
+
+    <script>
+        var addBtn = document.getElementById('addCase');
+        var deleteBtn = document.getElementById('deleteCase');
+        var form = document.getElementById('update');
+        var frequency = document.getElementById('frequencyInput');
+        addBtn.onclick = function () {
+            var caseNo = document.createElement('div');
+            caseNo.className = 'form-group row';
+            caseNo.innerHTML = '<label for="caseNoInput" class="col-sm-4 control-label">Case No.</label>\n' +
+                '                  <div class="col-sm-8">\n' +
+                '                    <input type="text" class="form-control" id="caseNoInput" name="caseNo" value="">\n'+
+                '                  </div>';
+            var caseDate = document.createElement('div');
+            caseDate.className = 'form-group row';
+            caseDate.innerHTML = '<label for="dateInput" class="col-sm-4 control-label">Date</label>\n' +
+                '                 <div class="col-sm-8">\n' +
+                '                   <input type="text" class="form-control" id="dateInput" name="date" value="">\n'+
+                '                 </div>';
+            form.insertBefore(caseNo, form.children[form.children.length-2]);
+            form.insertBefore(caseDate, form.children[form.children.length-2]);
+            var fre = document.querySelectorAll('#caseNoInput');
+            frequency.value = fre.length
+        };
+        deleteBtn.onclick = function () {
+            form.removeChild(form.children[form.children.length-3]);
+            form.removeChild(form.children[form.children.length-3]);
+            var fre = document.querySelectorAll('#caseNoInput');
+            frequency.value = fre.length
+        };
+
+
+    </script>
 
 </body>
 </html>

@@ -66,15 +66,15 @@
                     </div>
                   </div>
                  <div class="form-group row">
-                   <label for="latitudeInput" class="col-sm-4 control-label">Latitude</label>
+                   <label for="latitudeInsert" class="col-sm-4 control-label">Latitude</label>
                    <div class="col-sm-8">
-                     <input type="int" class="form-control" id="latitudeInput" placeholder="Latitude" name="latitude">
+                     <input type="int" class="form-control" id="latitudeInsert" placeholder="Latitude" name="latitude" >
                    </div>
                  </div>
                  <div class="form-group row">
-                   <label for="longitudeInput" class="col-sm-4 control-label">Longitude</label>
+                   <label for="longitudeInsert" class="col-sm-4 control-label">Longitude</label>
                    <div class="col-sm-8">
-                     <input type="int" class="form-control" id="longitudeInput" placeholder="Longitude" name="longitude">
+                     <input type="int" class="form-control" id="longitudeInsert" placeholder="Longitude" name="longitude">
                    </div>
                  </div>
                  <div class="form-group row">
@@ -92,8 +92,16 @@
                  <div class="form-group row">
                    <label for="safetyInput" class="col-sm-4 control-label">Safety Rating</label>
                    <div class="col-sm-8">
-                     <input type="int" class="form-control" id="safetyInput" placeholder="Safety Rating" name="safety_rating">
+                     <input type="int" class="form-control" id="safetyInput" placeholder="Safety Rating" name="safety">
                    </div>
+                     <a href="#" id="calculateSafety">Calculate Safety</a>
+                     {% with messages = get_flashed_messages() %}
+                      {% if messages %}
+                        {% for message in messages %}
+                          {{ message }}
+                        {% endfor %}
+                      {% endif %}
+                    {% endwith %}
                  </div>
                  <!-- <input type="submit" name="search_listing" value="search_listing"> -->
                  <input type="submit" class="btn btn-primary" id="new_listing" name="new_listing" value="Insert New Listing" style="font-weight: bold;
@@ -189,6 +197,21 @@
       </div>
     </div>
   </div>
+
+  <script>
+      //var calculate = document.getElementById("calculateSafety");
+      var calculate = document.getElementById("calculateSafety")
+      var latitude = document.getElementById('latitudeInsert');
+      var longitude = document.getElementById('longitudeInsert');
+
+      calculate.onclick = function(){
+          //window.open("{{ url_for('coordinate_safety', latitude='abc', longitude='efg') }}".replace('abc', latitude.value).replace('efg',longitude.value))
+          calculate.href = "{{ url_for('coordinate_safety', latitude='abc', longitude='efg') }}".replace('abc', latitude.value).replace('efg',longitude.value)
+      }
+
+
+  </script>
+
 </body>
 </html>
 

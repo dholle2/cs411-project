@@ -45,6 +45,21 @@
 
         <br/><br/>
 
+      <div>
+          <a href="{{ url_for("import_data") }}">Import Crime Data</a>
+      </div>
+      <div>
+          <a href="{{ url_for("reset_safety") }}">Reset Safety Rating</a>
+          <br/>
+          {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              {{ message }}
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+      </div>
+
         <div class="container">
           <div class="row">
             <!-- insert new listing -->
@@ -58,26 +73,7 @@
                     <div class="col-sm-8">
                       <input type="text" class="form-control" id="IDInput" maxlength="200" placeholder="ID" name="ID">
                     </div>
-                   <div class="form-group row">
-                    <label for="caseInput" class="col-sm-4 control-label">Case No.</label>
-                    <div class="col-sm-8">
-                      <input type="text" class="form-control" id="caseInput" maxlength="200" placeholder="Case Number" name="caseNo">
                     </div>
-                  </div>
-
-                   <div class="form-group row">
-                    <label for="datetimeInput" class="col-sm-4 control-label">Datetime</label>
-                    <div class="col-sm-8">
-                      <input type="datetime-local" class="form-control" id="datetimeInput" maxlength="200" placeholder="Datetime" name="datetime">
-                    </div>
-                  </div>
-                   <div class="form-group row">
-                    <label for="typeInput" class="col-sm-4 control-label">Type</label>
-                    <div class="col-sm-8">
-                      <input type="text" class="form-control" id="typeInput" maxlength="200" placeholder="type" name="type">
-                    </div>
-                  </div>
-
                  <div class="form-group row">
                    <label for="latitudeInput" class="col-sm-4 control-label">Latitude</label>
                    <div class="col-sm-8">
@@ -90,6 +86,44 @@
                      <input type="int" class="form-control" id="longitudeInput" placeholder="Longitude" name="longitude">
                    </div>
                  </div>
+                   <div class="form-group row">
+                    <label for="typeInput" class="col-sm-4 control-label">Type</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" id="typeInput" maxlength="200" placeholder="type" name="type">
+                    </div>
+                  </div>
+                   <div class="form-group row">
+                    <label for="arrestInput" class="col-sm-4 control-label">Arrest</label>
+                    <div class="col-sm-8">
+                        <select name="arrest" id="arrestInput" class="form-control">
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+                  </div>
+                   <div class="form-group row">
+                    <label for="freuencyInput" class="col-sm-4 control-label">Frequency</label>
+                    <div class="col-sm-8">
+                      <input type="number" class="form-control" id="frequencyInput" maxlength="200" placeholder="frequency" name="frequency">
+                    </div>
+                  </div>
+                   <div class="form-group row">
+                    <label for="caseNoInput" class="col-sm-4 control-label">Case No.</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" id="caseNoInput" maxlength="200" placeholder="Case Number" name="caseNo">
+                    </div>
+                  </div>
+                   <div class="form-group row">
+                    <label for="dateInput" class="col-sm-4 control-label">Date</label>
+                    <div class="col-sm-8">
+                      <input type="date" class="form-control" id="date" maxlength="200" placeholder="Date" name="date">
+                    </div>
+                  </div>
+                    <div style="margin: 10px">
+                       <input type="button" id='addCase' value="Add case">
+                       <input type="button" id='deleteCase' value="Delete case">
+                    </div>
+
                  <!-- <input type="submit" name="search_listing" value="search_listing"> -->
                  <input type="submit" class="btn btn-primary" id="new_listing" name="new_listing" value="Insert New Listing" style="font-weight: bold;
                   color: #f9fafc !important; background-color: #f3b1b2 !important; border: none;">
@@ -101,13 +135,48 @@
             <div class="container">
               <h4> Search For Listings </h4>
               <br/>
-              <form class="form-horizontal" method="POST" action="">
+                <form class="form-horizontal" method="POST" action="" id="insert_form">
                    <div class="form-group row">
                     <label for="IDInput" class="col-sm-4 control-label">ID</label>
                     <div class="col-sm-8">
                       <input type="text" class="form-control" id="IDInput" maxlength="200" placeholder="ID" name="ID">
                     </div>
+                    </div>
+                 <div class="form-group row">
+                   <label for="latitudeInput" class="col-sm-4 control-label">Latitude</label>
+                   <div class="col-sm-8">
+                     <input type="int" class="form-control" id="latitudeInput" placeholder="Latitude" name="latitude">
+                   </div>
+                 </div>
+                 <div class="form-group row">
+                   <label for="longitudeInput" class="col-sm-4 control-label">Longitude</label>
+                   <div class="col-sm-8">
+                     <input type="int" class="form-control" id="longitudeInput" placeholder="Longitude" name="longitude">
+                   </div>
+                 </div>
                    <div class="form-group row">
+                    <label for="typeInput" class="col-sm-4 control-label">Type</label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" id="typeInput" maxlength="200" placeholder="type" name="type">
+                    </div>
+                  </div>
+                   <div class="form-group row">
+                    <label for="arrestInput" class="col-sm-4 control-label">Arrest</label>
+                    <div class="col-sm-8">
+                        <select name="arrest" id="arrestInput" class="form-control">
+                            <option value="">All</option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+                  </div>
+                   <div class="form-group row">
+                    <label for="freuencyInput" class="col-sm-4 control-label">Frequency</label>
+                    <div class="col-sm-8">
+                      <input type="number" class="form-control" id="frequencyInput" maxlength="200" placeholder="frequency" name="frequency">
+                    </div>
+                  </div>
+                   <!--div class="form-group row">
                     <label for="caseInput" class="col-sm-4 control-label">Case No.</label>
                     <div class="col-sm-8">
                       <input type="text" class="form-control" id="caseInput" maxlength="200" placeholder="Case Number" name="caseNo">
@@ -115,17 +184,11 @@
                   </div>
 
                    <div class="form-group row">
-                    <label for="datetimeInput" class="col-sm-4 control-label">Datetime</label>
+                    <label for="dateInput" class="col-sm-4 control-label">Date</label>
                     <div class="col-sm-8">
-                      <input type="datetime-local" class="form-control" id="datetimeInput" maxlength="200" placeholder="Datetime" name="datetime">
+                      <input type="datetime-local" class="form-control" id="date" maxlength="200" placeholder="Date" name="date">
                     </div>
-                  </div>
-                   <div class="form-group row">
-                    <label for="typeInput" class="col-sm-4 control-label">Type</label>
-                    <div class="col-sm-8">
-                      <input type="text" class="form-control" id="typeInput" maxlength="200" placeholder="type" name="type">
-                    </div>
-                  </div>
+                  </div> -->
 
                <!-- <input type="submit" name="search_listing" value="search_listing"> -->
                <input type="submit" class="btn btn-primary" name="search_listing" value="Search For Listings" style="font-weight: bold;
@@ -146,24 +209,40 @@
           <table>
             <tr>
                 <th>ID</th>
-                <th>Case No.</th>
-                <!-- <th>Zipcode</th> -->
-                <th>Date</th>
-                <th>Type</th>
                 <th>Latitude</th>
                 <th>Longitude</th>
+                <!-- <th>Zipcode</th> -->
+                <th>Type</th>
+                <th>Arrest</th>
+                <th>Frequency</th>
+                <th>Case No.</th>
+                <th>Date</th>
                 <th>Operation</th>
             </tr>
             {% for crime in results %}
                 <tr>
-                    <td>{{ crime['ID'] }}</td>
-                    <td>{{ crime['Case Number'] }}</td>
-                    <td>{{ crime['Date'] }}</td>
-                    <td>{{ crime['Primary Type'] }}</td>
-                    <td>{{ crime['Latitude'] }}</td>
-                    <td>{{ crime['Longitude'] }}</td>
-                    <td><a href="{{ url_for("update_crime", crime_id=crime['ID']) }}">Edit</a>/
-                        <a href="{{ url_for("delete_crime", crime_id=crime['ID']) }}">Delete</a></td>
+                    <td>{{ crime['_id'] }}</td>
+                    <td>{{ crime['latitude'] }}</td>
+                    <td>{{ crime['longitude'] }}</td>
+                    <td>{{ crime['primary_type'] }}</td>
+                    <td>{{ crime['arrest'] }}</td>
+                    <td>{{ crime['frequency'] }}</td>
+                    <td>
+                       {% for detail in crime['detail'] %}
+                            {{ detail['case_number'] }}
+                            <br/>
+                        {% endfor %}
+                     </td>
+                    <td>
+                       {% for detail in crime['detail'] %}
+                            {{ detail['date'] }}
+                            <br/>
+                        {% endfor %}
+                    </td>
+
+
+                    <td><a href="{{ url_for("update_crime", crime_id=crime['_id']) }}">Edit</a>/
+                        <a href="{{ url_for("delete_crime", crime_id=crime['_id']) }}">Delete</a></td>
                 </tr>
             {% endfor %}
           </table>
@@ -171,5 +250,39 @@
       </div>
     </div>
   </div>
+
+  <script>
+        var addBtn = document.getElementById('addCase');
+        var deleteBtn = document.getElementById('deleteCase');
+        var form = document.getElementById('insert_form');
+        var frequency = document.getElementById('frequencyInput');
+        addBtn.onclick = function () {
+            var caseNo = document.createElement('div');
+            caseNo.className = 'form-group row';
+            caseNo.innerHTML = '<label for="caseNoInput" class="col-sm-4 control-label">Case No.</label>\n' +
+                '                  <div class="col-sm-8">\n' +
+                '                    <input type="text" class="form-control" id="caseNoInput" placeholder="Case Number" name="caseNo" value="">\n'+
+                '                  </div>';
+            var caseDate = document.createElement('div');
+            caseDate.className = 'form-group row';
+            caseDate.innerHTML = '<label for="dateInput" class="col-sm-4 control-label">Date</label>\n' +
+                '                 <div class="col-sm-8">\n' +
+                '                   <input type="date" class="form-control" id="dateInput" name="date" value="">\n'+
+                '                 </div>';
+            form.insertBefore(caseNo, form.children[form.children.length-2]);
+            form.insertBefore(caseDate, form.children[form.children.length-2]);
+            var fre = document.querySelectorAll('#caseNoInput');
+            frequency.value = fre.length
+        };
+        deleteBtn.onclick = function () {
+            form.removeChild(form.children[form.children.length-3]);
+            form.removeChild(form.children[form.children.length-3]);
+            var fre = document.querySelectorAll('#caseNoInput');
+            frequency.value = fre.length
+        };
+
+
+   </script>
+
 </body>
 </html>
