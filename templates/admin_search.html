@@ -176,6 +176,8 @@
                 <th>Price</th>
                 <th>Landlord</th>
                 <th>Safety Rating</th>
+                <th>Nearest Cafe</th>
+                <th>Nearest Cafe Address</th>
                 <th>Operation</th>
             </tr>
             {% for apartment in results %}
@@ -188,6 +190,8 @@
                     <td>{{ apartment[5] }}</td>
                     <td>{{ apartment[6] }}</td>
                     <td>{{ apartment[7] }}</td>
+                    <td>{{ apartment[8] }}</td>
+                    <td>{{ apartment[9] }}</td>
                     <td><a href="{{ url_for("update_apartment", apartment_id=apartment[0]) }}">Edit</a>/
                         <a href="{{ url_for("delete_apartment", apartment_id=apartment[0]) }}">Delete</a></td>
                 </tr>

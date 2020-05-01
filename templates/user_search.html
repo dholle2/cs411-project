@@ -94,6 +94,8 @@
         <th>Price</th>
         <th>Landlord</th>
         <th>Safety Rating</th>
+        <th>Nearest Cafe</th>
+        <th>Nearest Cafe Address</th>
       </tr>
         {% for apartment in results %}
             <tr>
@@ -105,6 +107,8 @@
                 <td>{{ apartment[5] }}</td>
                 <td>{{ apartment[6] }}</td>
                 <td>{{ apartment[7] }}</td>
+                <td>{{ apartment[8] }}</td>
+                <td>{{ apartment[9] }}</td>
             </tr>
         {% endfor %}
       </table>
