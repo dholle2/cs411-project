@@ -14,6 +14,7 @@ a:hover {
   /* color: #333; */
   color: white;
   text-shadow: none; /* Prevent inheritence from `body` */
+  /* pink color: f3b1b2 */
   background-color: #f3b1b2 !important;
   border: 1px solid #f3b1b2 !important;
 }
@@ -50,7 +51,7 @@ body {
   display: table;
   width: 100%;
   height: 600px;
-  /* background-color: #333; */
+   /* background-color: #333; */
   background-color: #e66a6f;
   height: 100%;
   min-height: 100%;
@@ -69,84 +70,18 @@ body {
   padding: 30px;
 }
 
-
-/*
- * Header
- */
-
- /* .container-bg {
-   background-color: #fff;
- }
-.masthead-brand {
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-
-.masthead-nav > li {
-  display: inline-block;
-}
-.masthead-nav > li + li {
-  margin-left: 20px;
-}
-.masthead-nav > li > a {
-  padding-right: 0;
-  padding-left: 0;
-  font-size: 16px;
-  font-weight: bold;
-  color: #fff; 
-  color: rgba(255,255,255,.75);
-  border-bottom: 2px solid transparent;
-  border-bottom: 2px solid
-}
-.masthead-nav > li > a:hover,
-.masthead-nav > li > a:focus {
-  border-bottom-color: #a9a9a9;
-  border-bottom-color: rgba(255,255,255,.25);
-}
-.masthead-nav > .active > a,
-.masthead-nav > .active > a:hover,
-.masthead-nav > .active > a:focus {
-  color: #fff;
-  border-bottom-color: #fff;
-}
-
-@media (min-width: 768px) {
-  .masthead-brand {
-    float: left;
-  }
-  .masthead-nav {
-    float: right;
-  }
-} */
-
 /* my navbar */
-.main-nav {
-  border-bottom:2px solid white;
-  padding-bottom:10px
-};
-
-#navbar ul li a:hover {
-  border-bottom-color: 3px solid white;
+/* .main-nav {
+  padding-bottom:50px;
+  z-index: 9999 !important;
+  position:fixed;
+  top:0;
+  width:100%
+} */
+.dropdown-menu,
+.dropdown-item {
+  z-index: 9999
 }
-
-.navbar a.active {
-  border-bottom-color: 3px solid white;
-}
-
-/*
- * Cover
- */
-
-.cover {
-  padding: 0 20px;
-}
-.cover .btn-lg {
-  padding: 10px 10px;
-  font-weight: bold;
-  margin-right: 10px;
-  margin-left: 10px;
-}
-
 /*
  * Affix and center
  */

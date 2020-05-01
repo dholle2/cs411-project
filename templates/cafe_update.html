@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <meta charset="UTF-8">
-  <title>AirBNB Update</title>
+  <title>Cafe Update</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
@@ -39,62 +39,44 @@
         <br/><br/>
 
         <div class="container w-50 p-3">
-          <h4> Update Listing </h4>
+          <h4> Update Cafe Info </h4>
           <br/>
           <form class="form-horizontal" method="POST" action="">
             <div class="form-group row">
-              <label for="IDInput" class="col-sm-4 control-label" style="text-align:right">ID</label>
+              <label for="cafeID" class="col-sm-4 control-label" style="text-align:right">ID</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" id="IDInput" name="ID" value="{{ apartment[0] }}">
+                <input type="text" class="form-control" id="cafeID" name="cafeID" value="{{ cafe[0] }}">
               </div>
             </div>
             <div class="form-group row">
-              <label for="descriptionInput" class="col-sm-4 control-label" style="text-align:right">Description</label>
+              <label for="cafeLat" class="col-sm-4 control-label" style="text-align:right">Latitude</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" id="descriptionInput" name="description" value="{{ apartment[1] }}">
+                <input type="int" class="form-control" id="cafeLat" name="cafeLat" value="{{ cafe[1] }}">
               </div>
             </div>
            <div class="form-group row">
-             <label for="latitudeInput" class="col-sm-4 control-label" style="text-align:right">Latitude</label>
+             <label for="cafeLong" class="col-sm-4 control-label" style="text-align:right">Longitude</label>
              <div class="col-sm-8">
-               <input type="int" class="form-control" id="latitudeInput" name="latitude" value="{{ apartment[2] }}">
+               <input type="int" class="form-control" id="cafeLong" name="cafeLong" value="{{ cafe[2] }}">
              </div>
            </div>
            <div class="form-group row">
-             <label for="longitudeInput" class="col-sm-4 control-label" style="text-align:right">Longitude</label>
+             <label for="cafeName" class="col-sm-4 control-label" style="text-align:right">Name</label>
              <div class="col-sm-8">
-               <input type="int" class="form-control" id="longitudeInput" name="longitude" value="{{ apartment[3] }}">
+               <input type="text" class="form-control" id="cafeName" name="cafeName" value="{{ cafe[3] }}">
              </div>
            </div>
            <div class="form-group row">
-             <label for="numGuestsInput" class="col-sm-4 control-label" style="text-align:right">Number of Guests</label>
+             <label for="cafeAddr" class="col-sm-4 control-label" style="text-align:right">Cafe Address</label>
              <div class="col-sm-8">
-               <input type="int" class="form-control" id="numGuestsInput" name="guest" value="{{ apartment[4] }}">
-             </div>
-           </div>
-           <div class="form-group row">
-             <label for="priceInput" class="col-sm-4 control-label" style="text-align:right">Price</label>
-             <div class="col-sm-8">
-               <input type="int" class="form-control" name="price" value="{{ apartment[5] }}"/>
-             </div>
-           </div>
-           <div class="form-group row">
-             <label for="landlordInput" class="col-sm-4 control-label" style="text-align:right">Landlord</label>
-             <div class="col-sm-8">
-               <input type="text" class="form-control" id="landlordInput" name="landlord" value="{{ apartment[6] }}">
-             </div>
-           </div>
-           <div class="form-group row">
-             <label for="safetyInput" class="col-sm-4 control-label" style="text-align:right">Safety Rating</label>
-             <div class="col-sm-8">
-               <input type="int" class="form-control" id="safetyInput" name="safety" value="{{ apartment[7] }}">
+               <input type="text" class="form-control" id="cafeAddr" name="cafeAddr" value="{{ cafe[4] }}">
              </div>
            </div>
            <div class="form-group row">
             <div class="col-sm-4">
             </div>
             <div class="col-sm-8"><span class="float-left">
-              <input type="submit" class="btn btn-primary" name="update_listing" value="Update Listing">
+              <input type="submit" class="btn btn-primary" name="update_cafe" value="Update Cafe Info">
             </span>
             </div>
           </div>
@@ -103,7 +85,6 @@
         </div>
       </div>
 
-</div>
 </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
