@@ -1,0 +1,14 @@
+Flask
+gunicorn
+Werkzeug
+flask_cors
+flask_mysqldb
+pyyaml
+flask_sqlalchemy
+flask_pymongo
+pygeodesy
+pymongo
+pymysql
+pandas
+sodapy
+datetime
