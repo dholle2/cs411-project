@@ -45,15 +45,15 @@
         </button>
         <button type="button" class="btn btn-primary">
           <a href="{{ url_for("reset_safety") }}" style="color:white">Reset Safety Rating</a>
-          <br/>
-          {% with messages = get_flashed_messages() %}
+      </button>
+      <br/>
+        {% with messages = get_flashed_messages() %}
           {% if messages %}
             {% for message in messages %}
               {{ message }}
             {% endfor %}
           {% endif %}
         {% endwith %}
-      </button>
       </div>
 
       <br/><br/>

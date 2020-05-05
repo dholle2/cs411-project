@@ -144,8 +144,8 @@
                     <td>{{ cafe[2] }}</td>
                     <td>{{ cafe[3] }}</td>
                     <td>{{ cafe[4] }}</td>
-                    <td><a href="{{ url_for("update_apartment", apartment_id=apartment[0]) }}">Edit</a>/
-                        <a href="{{ url_for("delete_apartment", apartment_id=apartment[0]) }}">Delete</a></td>
+                    <td><a href="{{ url_for("cafe_update", cafe_id=cafe[0]) }}">Edit</a>/
+                        <a href="{{ url_for("cafe_delete", cafe_id=cafe[0]) }}">Delete</a></td>
                 </tr>
             {% endfor %}
           </table>

@@ -27,7 +27,7 @@ app.config['MYSQL_HOST'] = db['mysql_host']
 app.config['MYSQL_USER'] = db['mysql_user']
 app.config['MYSQL_PASSWORD'] = db['mysql_password']
 app.config['MYSQL_DB'] = db['mysql_db']
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:pass@127.0.0.1/airbnb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@127.0.0.1/airbnb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # mongodb
 app.config['MONGO_URI'] = 'mongodb+srv://user1:user1password@cluster0-9dppt.mongodb.net/crimedata?retryWrites=true&w=majority'
@@ -50,40 +50,27 @@ class Apartment(db2.Model):
     ID = db2.Column(db2.Integer, primary_key=True)
     Description = db2.Column(db2.String(200))
     # Zipcode = db2.Column(db2.Integer)
-    Latitude = db2.Column(db2.Float)
-    Longitude = db2.Column(db2.Float)
+    Latitude = db2.Column(db2.DECIMAL(10,8))
+    Longitude = db2.Column(db2.DECIMAL(10,8))
     NumGuests = db2.Column(db2.Integer)
     Price = db2.Column(db2.Integer)
     Landlord = db2.Column(db2.String(50))
-    SafetyRating = db2.Column(db2.Float)
+    SafetyRating = db2.Column(db2.DECIMAL(5,2))
 
     def __repr__(self):
         return 'Apartment ID: %s Landord: %s' % (self.ID, self.Landlord)
-class Cafe(db3.Model):
+class Cafe(db2.Model):
     __tablename__ = 'cafe'
     # columns
-    ID = db3.Column(db3.Integer, primary_key=True)
-    Latitude = db3.Column(db3.Float)
-    Longitude = db3.Column(db3.Float)
-    Name = db3.Column(db3.String(50))
-    Address = db3.Column(db3.String(100))
+    ID = db2.Column(db2.Integer, primary_key=True)
+    Latitude = db2.Column(db2.DECIMAL(10,8))
+    Longitude = db2.Column(db2.DECIMAL(10,8))
+    Name = db2.Column(db2.String(50))
+    Address = db2.Column(db2.String(100))
 
     def __repr__(self):
         return 'Cafe ID: %s Name: %s' % (self.ID, self.Name)
-"""
-#search
-mycol = mongo.db[collection_name]
-mycol.find_one(conditions_dic)
-mycol.find(conditions_dic).sort([order_rule]).skip(page_num*(page_num-1)).limit(page_size)
-#update
-mycol.update(conditions_dic,{'$set':data_dic}, multi=multi_field_update)
-mycol.update(conditions_dic, {'$set': data_dic})
-#insert
-mycol.insert(data_dic)
-delete
-mycol.delete_many
-mycol.delete_one
-"""
+
 
 def cal_safety(apartment:list, crimes:list):
     """
@@ -134,14 +121,81 @@ def cal_safety(apartment:list, crimes:list):
 def index():
     return render_template('index.html')
 
-# added cafe route
-@app.route('/cafe.html')
-def cafe():
-    return render_template('cafe.html')
-
 @app.route('/database.html')
 def database():
     return render_template('database.html')
+
+# added cafe route
+@app.route('/cafe.html', methods=['GET', 'POST'])
+def cafe():
+    results = []
+    if request.method == 'POST':
+        if 'cafeSearch' in request.form:
+            name = request.form.get('cafeName')
+            latitude = request.form.get('latitude')
+            longitude = request.form.get('longitude')
+            id = ''
+            condition = ["ID != %s"]
+            para = [id]
+            if name:
+                condition.append("Name LIKE %s")
+                para.append('%' + name + '%')
+            if latitude:
+                condition.append("Latitude=%s")
+                para.append(float(latitude))
+            if longitude:
+                condition.append("Longitude=%s")
+                para.append((float(longitude)))
+            cur = mysql.connection.cursor()
+            results = cur.execute("SELECT * FROM cafe WHERE " + " AND ".join(condition), para)
+            if results > 0:
+                resultsDetails = cur.fetchall()
+            else:
+                resultsDetails = []
+            return render_template('cafe.html', results=resultsDetails)
+        if 'new_cafe' in request.form:
+            id = request.form.get('cafeID')
+            name = request.form.get('cafeName')
+            latitude = request.form.get('cafeLat')
+            longitude = request.form.get('longitude')
+            address = request.form.get('cafeAddr')
+            cur = mysql.connection.cursor()
+            cur.execute("INSERT INTO cafe VALUES(%s, %s, %s, %s, %s)",
+                        (int(id), float(latitude), float(longitude), name, address))
+            mysql.connection.commit()
+            cur.close()
+    return render_template('cafe.html', results=results)
+
+# delete cafe data
+@app.route('/cafe.html/delete/<cafe_id>')
+def cafe_delete(cafe_id):
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM cafe WHERE ID=(%s)", (cafe_id,))
+    mysql.connection.commit()
+    cur.close()
+    return redirect(url_for('cafe'))
+
+# update cafe data
+@app.route('/cafe.html/update/<cafe_id>', methods=['GET', 'POST'])
+def cafe_update(cafe_id):
+    cur = mysql.connection.cursor()
+    results = cur.execute("SELECT * FROM cafe WHERE ID=(%s)", (cafe_id,))
+    cafe=cur.fetchone()
+    if request.method == 'POST':
+        id = request.form.get('cafeID')
+        latitude = request.form.get('cafeLat')
+        longitude = request.form.get('cafeLong')
+        name = request.form.get('cafeName')
+        address = request.form.get('cafeAddr')
+        #cur = mysql.connection.cursor()
+        updated = "UPDATE cafe SET ID=%s, Latitude=%s, Longitude=%s, `name`=%s, Address=%s WHERE ID=(%s)"
+        cur.execute(updated, [int(id), float(latitude), float(longitude), name, address, int(cafe_id)])
+        #cur.execute("UPDATE apartment SET ID=%s, Latitude=%s, Longitude=%s, `name`=%s, Address=%s WHERE ID=(%s)" ,
+                   # (id, latitude, longitude, name, address, cafe_id))
+        mysql.connection.commit()
+        cur.close()
+        return redirect(url_for('cafe'))
+    return render_template('cafe_update.html', cafe=cafe)
 
 @app.route('/admin_mongo.html/calculate')
 def reset_safety():
@@ -202,7 +256,6 @@ def import_data():
     flash('Finished')
     return redirect(url_for('admin_mongo'))
 
-
 # mongodb CRUD
 @app.route('/admin_mongo.html', methods=['GET', 'POST'])
 def admin_mongo():
@@ -218,7 +271,6 @@ def admin_mongo():
             frequency = request.form.get('frequency')
             #caseNo = request.form.get('caseNo')
             #date = request.form.get('date')
-
             condition = {}
             if ID:
                 condition['_id'] = int(ID)
@@ -293,13 +345,6 @@ def update_crime(crime_id):
 @app.route('/admin_search.html', methods=['GET', 'POST'])
 def admin_search():
     results = []
-    #latitude = request.form.get('latitude')
-    #longitude = request.form.get('longitude')
-    #flash(str(longitude))
-
-    latitude2 = request.values.get('latitudeInsert','')
-    longitude2 = request.values.get('longitudeInsert','')
-    flash(latitude2)
     if request.method == 'POST':
         if 'search_listing' in request.form:
             # zipcode = request.form.get('zipcode')
@@ -362,10 +407,11 @@ def admin_search():
 
             cur = mysql.connection.cursor()
             # cur.execute("INSERT INTO apartment VALUES(null, %s, %s, %s, %s, %s, %s)", (str(description), zipcode, num_guests, price, str(landlord), safety_rating))
-            cur.execute("INSERT INTO apartment VALUES(null, %s, %s, %s, %s, %s, %s, %s)", (str(description), latitude, longitude, num_guests, price, str(landlord), safety_rating))
+            cur.execute("INSERT INTO apartment VALUES(null, %s, %s, %s, %s, %s, %s, %s)",
+                        (str(description), latitude, longitude, num_guests, price, str(landlord), safety_rating))
             mysql.connection.commit()
             cur.close()
-    return render_template('admin_search.html', results=results, lati=latitude2, longi=longitude2)
+    return render_template('admin_search.html', results=results)
 
 @app.route('/user_search.html/<latitude>&<longitude>')
 def coordinate_safety(latitude, longitude):
@@ -398,6 +444,12 @@ def user_search():
         # if zipcode:
         #     condition.append("Zipcode=%s")
         #     para.append(int(zipcode))
+        if latitude:
+            condition.append("Latitude=%s")
+            para.append(float(latitude))
+        if longitude:
+            condition.append('Longitude=%s')
+            para.append(float(longitude))
         if guest:
             condition.append("NumGuests=%s")
             para.append(int(guest))
@@ -430,7 +482,7 @@ def user_search():
 @app.route('/admin_search.html/delete/<apartment_id>')
 def delete_apartment(apartment_id):
     cur = mysql.connection.cursor()
-    cur.execute("DELETE FROM apartment WHERE ID=(%s)", apartment_id)
+    cur.execute("DELETE FROM apartment WHERE ID=(%s)", (apartment_id,))
     mysql.connection.commit()
     cur.close()
     return redirect(url_for('admin_search'))
@@ -439,7 +491,7 @@ def delete_apartment(apartment_id):
 @app.route('/admin_search.html/update/<apartment_id>', methods=['GET', 'POST'] )
 def update_apartment(apartment_id):
     cur = mysql.connection.cursor()
-    results = cur.execute("SELECT * FROM apartment WHERE ID=%s", apartment_id)
+    results = cur.execute("SELECT * FROM apartment WHERE ID=%s", (apartment_id,))
     apartment=cur.fetchone()
     if request.method == 'POST':
         id = request.form.get('ID')
@@ -580,8 +632,8 @@ if __name__ == '__main__':
     db2.drop_all()
     db2.create_all()
 
-    db3.drop_all()
-    db3.create_all()
+    #db3.drop_all()
+    #db3.create_all()
 
     c1 = Cafe(ID=1, Latitude=41.90332445, Longitude= -87.675825455, Name= "MODERN ASIAN KITCHEN", Address = "1924 W DIVISION ST")
     c2 = Cafe(ID=2, Latitude=41.878014487, Longitude= -87.63318903, Name= "Qdoba Mexican Eats #2154", Address = "175 W JACKSON BLVD")
@@ -890,8 +942,8 @@ if __name__ == '__main__':
     c305 = Cafe(ID=305, Latitude=41.948788471, Longitude= -87.654229117, Name= "Murphy's Bleachers", Address = "3653-55 N SHEFFIELD AVE")
     c306 = Cafe(ID=306, Latitude=41.918442455, Longitude= -87.652015059, Name= "ANNETTE'S ITALIAN ICE", Address = "2009 N BISSELL ST")
 
-    db3.session.add_all([c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15,c16,c17,c18,c19,c20,c21,c22,c23,c24,c25,c26,c27,c28,c29,c30,c31,c32,c33,c34,c35,c36,c37,c38,c39,c40,c41,c42,c43,c44,c45,c46,c47,c48,c49,c50,c51,c52,c53,c54,c55,c56,c57,c58,c59,c60,c61,c62,c63,c64,c65,c66,c67,c68,c69,c70,c71,c72,c73,c74,c75,c76,c77,c78,c79,c80,c81,c82,c83,c84,c85,c86,c87,c88,c89,c90,c91,c92,c93,c94,c95,c96,c97,c98,c99,c100,c101,c102,c103,c104,c105,c106,c107,c108,c109,c110,c111,c112,c113,c114,c115,c116,c117,c118,c119,c120,c121,c122,c123,c124,c125,c126,c127,c128,c129,c130,c131,c132,c133,c134,c135,c136,c137,c138,c139,c140,c141,c142,c143,c144,c145,c146,c147,c148,c149,c150,c151,c152,c153,c154,c155,c156,c157,c158,c159,c160,c161,c162,c163,c164,c165,c166,c167,c168,c169,c170,c171,c172,c173,c174,c175,c176,c177,c178,c179,c180,c181,c182,c183,c184,c185,c186,c187,c188,c189,c190,c191,c192,c193,c194,c195,c196,c197,c198,c199,c200,c201,c202,c203,c204,c205,c206,c207,c208,c209,c210,c211,c212,c213,c214,c215,c216,c217,c218,c219,c220,c221,c222,c223,c224,c225,c226,c227,c228,c229,c230,c231,c232,c233,c234,c235,c236,c237,c238,c239,c240,c241,c242,c243,c244,c245,c246,c247,c248,c249,c250,c251,c252,c253,c254,c255,c256,c257,c258,c259,c260,c261,c262,c263,c264,c265,c266,c267,c268,c269,c270,c271,c272,c273,c274,c275,c276,c277,c278,c279,c280,c281,c282,c283,c284,c285,c286,c287,c288,c289,c290,c291,c292,c293,c294,c295,c296,c297,c298,c299,c300,c301,c302,c303,c304,c305,c306])
-    db3.session.commit()
+    db2.session.add_all([c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15,c16,c17,c18,c19,c20,c21,c22,c23,c24,c25,c26,c27,c28,c29,c30,c31,c32,c33,c34,c35,c36,c37,c38,c39,c40,c41,c42,c43,c44,c45,c46,c47,c48,c49,c50,c51,c52,c53,c54,c55,c56,c57,c58,c59,c60,c61,c62,c63,c64,c65,c66,c67,c68,c69,c70,c71,c72,c73,c74,c75,c76,c77,c78,c79,c80,c81,c82,c83,c84,c85,c86,c87,c88,c89,c90,c91,c92,c93,c94,c95,c96,c97,c98,c99,c100,c101,c102,c103,c104,c105,c106,c107,c108,c109,c110,c111,c112,c113,c114,c115,c116,c117,c118,c119,c120,c121,c122,c123,c124,c125,c126,c127,c128,c129,c130,c131,c132,c133,c134,c135,c136,c137,c138,c139,c140,c141,c142,c143,c144,c145,c146,c147,c148,c149,c150,c151,c152,c153,c154,c155,c156,c157,c158,c159,c160,c161,c162,c163,c164,c165,c166,c167,c168,c169,c170,c171,c172,c173,c174,c175,c176,c177,c178,c179,c180,c181,c182,c183,c184,c185,c186,c187,c188,c189,c190,c191,c192,c193,c194,c195,c196,c197,c198,c199,c200,c201,c202,c203,c204,c205,c206,c207,c208,c209,c210,c211,c212,c213,c214,c215,c216,c217,c218,c219,c220,c221,c222,c223,c224,c225,c226,c227,c228,c229,c230,c231,c232,c233,c234,c235,c236,c237,c238,c239,c240,c241,c242,c243,c244,c245,c246,c247,c248,c249,c250,c251,c252,c253,c254,c255,c256,c257,c258,c259,c260,c261,c262,c263,c264,c265,c266,c267,c268,c269,c270,c271,c272,c273,c274,c275,c276,c277,c278,c279,c280,c281,c282,c283,c284,c285,c286,c287,c288,c289,c290,c291,c292,c293,c294,c295,c296,c297,c298,c299,c300,c301,c302,c303,c304,c305,c306])
+    db2.session.commit()
 
     ap2 = Apartment(ID=1, Description='Modern Boystown/Wrigleyville 1 BDRM', Latitude=41.9488427926778, Longitude=-87.6490462233825, NumGuests=3, Price=103, Landlord='Michael', SafetyRating=0.0)
     ap3 = Apartment(ID=2, Description='The Best Location in Downtown Chi!', Latitude=41.8904217387672, Longitude=-87.6320817379974, NumGuests=2, Price=99, Landlord='Kelsea', SafetyRating=0.0)
