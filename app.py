@@ -39,6 +39,7 @@ mongo = PyMongo(app)
 crimes = mongo.db['crimeRecords']
 CORS(app)
 db2 = SQLAlchemy(app)
+limit = 500
 
 #create table
 class Apartment(db2.Model):
@@ -109,7 +110,7 @@ def cal_safety(apartment:list, crimes:list):
         '''
         score = base_score * arrest_leverage * crime['frequency']
         total_score += score
-    rating = round(10 - total_score / 100, 2)
+    rating = round(10 - total_score / (limit/10), 2)
     return rating
 
 
@@ -212,7 +213,7 @@ def reset_safety():
 @app.route('/admin_mongo.html/import')
 def import_data():
     client = Socrata("data.cityofchicago.org", None)
-    results = client.get("qzdf-xmn8", limit=1000)
+    results = client.get("qzdf-xmn8", limit=limit)
     results_df = pd.DataFrame.from_records(results,
                                            exclude=['location', 'district', 'block', 'y_coordinate', 'description',
                                                     'location_description', 'updated_on', 'community_area',
