@@ -27,7 +27,8 @@ app.config['MYSQL_HOST'] = db['mysql_host']
 app.config['MYSQL_USER'] = db['mysql_user']
 app.config['MYSQL_PASSWORD'] = db['mysql_password']
 app.config['MYSQL_DB'] = db['mysql_db']
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@127.0.0.1/airbnb'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@127.0.0.1/airbnb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://sql9338062:VdwtSGAvVG@sql9.freemysqlhosting.net/sql9338062'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # mongodb
 app.config['MONGO_URI'] = 'mongodb+srv://user1:user1password@cluster0-9dppt.mongodb.net/crimedata?retryWrites=true&w=majority'
@@ -38,10 +39,6 @@ mongo = PyMongo(app)
 crimes = mongo.db['crimeRecords']
 CORS(app)
 db2 = SQLAlchemy(app)
-db3 = SQLAlchemy(app)
-#mongo.db.users.insert({'name':name, 'email':email})
-#mongo.db.users.find({"online": True})
-
 
 #create table
 class Apartment(db2.Model):
@@ -50,12 +47,12 @@ class Apartment(db2.Model):
     ID = db2.Column(db2.Integer, primary_key=True)
     Description = db2.Column(db2.String(200))
     # Zipcode = db2.Column(db2.Integer)
-    Latitude = db2.Column(db2.DECIMAL(10,8))
-    Longitude = db2.Column(db2.DECIMAL(10,8))
+    Latitude = db2.Column(db2.DECIMAL(15,8))
+    Longitude = db2.Column(db2.DECIMAL(15,8))
     NumGuests = db2.Column(db2.Integer)
     Price = db2.Column(db2.Integer)
     Landlord = db2.Column(db2.String(50))
-    SafetyRating = db2.Column(db2.DECIMAL(5,2))
+    SafetyRating = db2.Column(db2.DECIMAL(6,2))
 
     def __repr__(self):
         return 'Apartment ID: %s Landord: %s' % (self.ID, self.Landlord)
@@ -63,8 +60,8 @@ class Cafe(db2.Model):
     __tablename__ = 'cafe'
     # columns
     ID = db2.Column(db2.Integer, primary_key=True)
-    Latitude = db2.Column(db2.DECIMAL(10,8))
-    Longitude = db2.Column(db2.DECIMAL(10,8))
+    Latitude = db2.Column(db2.DECIMAL(15,8))
+    Longitude = db2.Column(db2.DECIMAL(15,8))
     Name = db2.Column(db2.String(50))
     Address = db2.Column(db2.String(100))
 
@@ -1271,8 +1268,8 @@ if __name__ == '__main__':
 
     db2.session.commit()
 
-    #db3 = pymysql.connect("localhost", "root", "", "airbnb")
-    """
+    db3 = pymysql.connect("sql9.freemysqlhosting.net", "sql9338062", "VdwtSGAvVG", "sql9338062")
+
     cursor = db3.cursor()
     #cursor = mysql.connection.cursor()
     cursor.execute("select * from apartment")
@@ -1284,5 +1281,4 @@ if __name__ == '__main__':
         db3.commit()
     cursor.close()
 
-    """
     app.run(debug=True)

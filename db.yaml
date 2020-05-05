@@ -1,4 +1,9 @@
-mysql_host: 'localhost'
-mysql_user: 'root'
-mysql_password: ''
-mysql_db: 'airbnb'
+#mysql_host: 'localhost'
+#mysql_user: 'root'
+#mysql_password: ''
+#mysql_db: 'airbnb'
+
+mysql_host: 'sql9.freemysqlhosting.net'
+mysql_user: 'sql9338062'
+mysql_password: 'VdwtSGAvVG'
+mysql_db: 'sql9338062'
