@@ -12,3 +12,4 @@ pymysql
 pandas
 sodapy
 datetime
+dnspython
